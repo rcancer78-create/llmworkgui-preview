@@ -420,7 +420,15 @@ public sealed class UnifiedShellVisualTests
         double width,
         double height)
     {
-        var view = new UnifiedWorkspaceShellView { DataContext = viewModel };
+        // These tests exercise the requested viewport, independently of the runner's desktop size.
+        // A shown native window can be clamped to a smaller monitor; explicit content dimensions
+        // prevent its next layout pass from replacing the viewport used by the assertions below.
+        var view = new UnifiedWorkspaceShellView
+        {
+            DataContext = viewModel,
+            Width = width,
+            Height = height
+        };
 
         var window = new Window
         {
@@ -443,6 +451,9 @@ public sealed class UnifiedShellVisualTests
         view.Measure(new Size(width, height));
         view.Arrange(new Rect(0, 0, width, height));
         view.UpdateLayout();
+
+        Assert.Equal(width, view.ActualWidth);
+        Assert.Equal(height, view.ActualHeight);
 
         return (window, view);
     }

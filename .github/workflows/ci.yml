@@ -67,7 +67,7 @@ jobs:
         run: |
           $results = Join-Path $PWD "artifacts/ci/$env:SUITE_NAME"
           New-Item -ItemType Directory -Force $results | Out-Null
-          $testArgs = @('test', $env:SUITE_PROJECT, '-c', 'Release', '--no-build', '--no-restore', '--logger', 'trx;LogFileName=results.trx', '--results-directory', $results)
+          $testArgs = @('test', $env:SUITE_PROJECT, '-c', 'Release', '--no-build', '--no-restore', '--blame-hang', '--blame-hang-timeout', '5m', '--blame-hang-dump-type', 'mini', '--logger', 'trx;LogFileName=results.trx', '--results-directory', $results)
           if ($env:SUITE_FILTER) { $testArgs += @('--filter', $env:SUITE_FILTER) }
           dotnet @testArgs 2>&1 | Tee-Object -FilePath (Join-Path $results 'tests.log')
           $testExitCode = $LASTEXITCODE

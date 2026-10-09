@@ -513,7 +513,8 @@ public sealed partial class MirasimLifecycleContractTests
         ILogger<MirasimSessionLifecycleService>? logger = null,
         TimeSpan? requestTimeout = null,
         MirasimLifecycleHostedService? lifetime = null,
-        TimeSpan? turnHardTimeout = null)
+        TimeSpan? turnHardTimeout = null,
+        TimeProvider? timeProvider = null)
     {
         var bootstrap = new FixtureBootstrapHandler(handler);
         var httpClient = new HttpClient(bootstrap)
@@ -526,7 +527,7 @@ public sealed partial class MirasimLifecycleContractTests
             httpClient,
             Options.Create(options),
             checkoutLockService ?? new FakeCheckoutLockService { RequiresLock = false },
-            logger, egressPolicy: new FixtureMetadataPolicy(), executionJournal: new FixtureExecutionJournal(), lifetime: lifetime);
+            logger, timeProvider: timeProvider, egressPolicy: new FixtureMetadataPolicy(), executionJournal: new FixtureExecutionJournal(), lifetime: lifetime);
         // Protocol fixtures use an explicitly synthetic policy. Seed the actual local lifecycle
         // binding through session creation, then record only the operation under test.
         service.CreateSessionAsync("fixture-instance", Harness, ModelId, "C:\\workspace\\project-1",

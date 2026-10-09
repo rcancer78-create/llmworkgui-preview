@@ -862,7 +862,7 @@ public sealed class WorkflowRunReviewGateStatusTests : IDisposable
     }
 
     /// <summary>
-    /// The ordinary shipped window, not an artificial one. Everything the operator has to reach for a running
+    /// The shipped screen at its default viewport. Everything the operator has to reach for a running
     /// stage - the run and its gate, the current-stage artifact input, the assigned-review action and the user
     /// decision - is a laid-out control inside 1280x800, and each is still the view model's own command.
     /// <para>
@@ -1790,7 +1790,9 @@ public sealed class WorkflowRunReviewGateStatusTests : IDisposable
         double height = 900,
         bool show = true)
     {
-        var host = new ContentControl { Content = viewModel };
+        // Keep the declared screen viewport when a hosted runner clamps the native window to its
+        // smaller desktop. Assertions still require every action to fit inside this 1280px layout.
+        var host = new ContentControl { Content = viewModel, Width = 1280, Height = height };
 
         var window = new Window
         {
@@ -1823,6 +1825,9 @@ public sealed class WorkflowRunReviewGateStatusTests : IDisposable
         host.Measure(new Size(1280, height));
         host.Arrange(new Rect(0, 0, 1280, height));
         host.UpdateLayout();
+
+        Assert.Equal(1280, host.ActualWidth);
+        Assert.Equal(height, host.ActualHeight);
 
         return (window, host);
     }
