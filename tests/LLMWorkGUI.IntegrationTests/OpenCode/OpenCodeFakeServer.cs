@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Diagnostics;
 using System.Text;
+using LLMGateway.Native;
+using LLMWorkGUI.Infrastructure.Processes;
 using LLMWorkGUI.IntegrationTests.Processes;
 
 namespace LLMWorkGUI.IntegrationTests.OpenCode;
@@ -8,6 +10,7 @@ namespace LLMWorkGUI.IntegrationTests.OpenCode;
 internal sealed class OpenCodeFakeServer : IDisposable
 {
     private readonly TestDirectory _directory = new();
+    private readonly List<Process> _ownedRoots = [];
 
     public OpenCodeFakeServer(string? startupLine, int? exitCode = null)
     {
@@ -25,9 +28,11 @@ internal sealed class OpenCodeFakeServer : IDisposable
 
         var processIdFilePath = _directory.GetPath("server.pid");
         var helperPath = WriteHelperScript();
+        var node = new ExecutableResolver().Resolve("node")?.FileName
+            ?? throw new InvalidOperationException("Node.js 22 is required for fake CLI tests.");
         var body = new StringBuilder()
             .AppendLine("@echo off")
-            .Append("powershell -NoProfile -ExecutionPolicy Bypass -File \"")
+            .Append('"').Append(node).Append("\" \"")
             .Append(helperPath)
             .Append("\" \"")
             .Append(processIdFilePath)
@@ -43,6 +48,20 @@ internal sealed class OpenCodeFakeServer : IDisposable
 
     public string? ProcessIdFilePath { get; }
     public string? HelperProcessIdFilePath => ProcessIdFilePath is null ? null : ProcessIdFilePath + ".helper";
+
+    public bool StartProcess(Process process)
+    {
+        var started = process.Start();
+        if (started && ProcessIdFilePath is not null)
+        {
+            // Keep this exact native lifetime for failure cleanup, independently of the
+            // supervisor's handle. A later PID-file lookup must never authorize a kill.
+            var root = Process.GetProcessById(process.Id);
+            _ = root.SafeHandle;
+            lock (_ownedRoots) _ownedRoots.Add(root);
+        }
+        return started;
+    }
 
     public Task<int> GetHelperProcessIdAsync() => HelperProcessIdFilePath is null
         ? throw new InvalidOperationException("This fake server has no helper process.")
@@ -62,22 +81,22 @@ internal sealed class OpenCodeFakeServer : IDisposable
 
     public void Dispose()
     {
+        List<Process> roots;
+        lock (_ownedRoots) roots = [.. _ownedRoots];
+        var descendants = new List<Process>();
         try
         {
-            // Test failure cleanup is separate from assertions that production actually stopped
-            // the helper. Match its recorded lifetime and retain a handle before any kill.
-            if (HelperProcessIdFilePath is { } pidFile && File.Exists(pidFile) && File.Exists(pidFile + ".start")
-                && int.TryParse(File.ReadAllText(pidFile), CultureInfo.InvariantCulture, out var pid)
-                && long.TryParse(File.ReadAllText(pidFile + ".start"), CultureInfo.InvariantCulture, out var ticks))
+            // This runs after the physical-cleanup assertions. Native ancestry and creation
+            // times bind descendants to retained roots, including a root that has exited.
+            descendants = NativeProcessTreeSnapshot.Capture(roots);
+            foreach (var owned in descendants.Concat(roots))
             {
                 try
                 {
-                    using var helper = Process.GetProcessById(pid);
-                    _ = helper.SafeHandle;
-                    if (helper.StartTime.ToUniversalTime().Ticks == ticks && !helper.HasExited)
+                    if (!owned.HasExited)
                     {
-                        helper.Kill(entireProcessTree: true);
-                        if (!helper.WaitForExit(5000)) { throw new TimeoutException("Owned fake helper did not stop."); }
+                        owned.Kill(entireProcessTree: true);
+                        if (!owned.WaitForExit(5000)) { throw new TimeoutException("Owned fake server did not stop."); }
                     }
                 }
                 catch (Exception exception) when (exception is ArgumentException or InvalidOperationException
@@ -85,23 +104,24 @@ internal sealed class OpenCodeFakeServer : IDisposable
                 { } // An exiting helper can disappear between probes; never target a reused PID.
             }
         }
-        finally { _directory.Dispose(); }
+        finally
+        {
+            foreach (var owned in descendants.Concat(roots)) owned.Dispose();
+            _directory.Dispose();
+        }
     }
 
     private string WriteHelperScript()
     {
-        var path = _directory.GetPath("server-helper.ps1");
+        var path = _directory.GetPath("server-helper.cjs");
         var body = string.Join(
             Environment.NewLine,
-            "param([string]$PidFile, [string]$StartupLine)",
-            "$ErrorActionPreference = 'Stop'",
-            "$parent = (Get-CimInstance Win32_Process -Filter \"ProcessId=$PID\").ParentProcessId",
-            "$helper = [Diagnostics.Process]::GetCurrentProcess()",
-            "[IO.File]::WriteAllText($PidFile + '.helper.start', [string]$helper.StartTime.ToUniversalTime().Ticks)",
-            "[IO.File]::WriteAllText($PidFile + '.helper', [string]$PID)",
-            "[IO.File]::WriteAllText($PidFile, [string]$parent)",
-            "if ($StartupLine) { Write-Output $StartupLine }",
-            "Start-Sleep -Seconds 3600",
+            "const fs = require('node:fs');",
+            "const [pidFile, startupLine] = process.argv.slice(2);",
+            "fs.writeFileSync(pidFile + '.helper', String(process.pid));",
+            "fs.writeFileSync(pidFile, String(process.ppid));",
+            "if (startupLine) process.stdout.write(startupLine + '\\n');",
+            "setInterval(() => {}, 1000);",
             string.Empty);
 
         File.WriteAllText(path, body, new UTF8Encoding(false));

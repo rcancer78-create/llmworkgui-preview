@@ -69,18 +69,24 @@ public sealed class OpenCodeOwnedLaunchTests
         var ambient = "LLMWORKGUI_AMBIENT_" + Guid.NewGuid().ToString("N");
         Environment.SetEnvironmentVariable(ambient, "synthetic-parent-only");
         var capture = files.GetPath("capture.json");
-        var script = files.GetPath("server.ps1");
+        var script = files.GetPath("server.cjs");
         var cli = files.GetPath("opencode.cmd");
-        var powerShell = Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
+        var node = new LLMGateway.Native.ExecutableResolver().Resolve("node")?.FileName
+            ?? throw new InvalidOperationException("Node.js 22 is required for fake CLI tests.");
+        // Use only Node builtins for this environment/ownership fixture: readiness
+        // must not depend on Windows PowerShell module initialization.
         await File.WriteAllTextAsync(script, $$"""
-            $ErrorActionPreference='Stop'
-            $value=@{Ambient=[Environment]::GetEnvironmentVariable('{{ambient}}');Selected=$env:LLMWORKGUI_SELECTED;
-                Directory=[Environment]::CurrentDirectory;Home=$env:HOME}
-            [IO.File]::WriteAllText('{{capture.Replace("'", "''", StringComparison.Ordinal)}}',($value|ConvertTo-Json -Compress))
-            Write-Output 'Listening on http://127.0.0.1:54321'
-            Start-Sleep -Seconds 3600
+            const fs = require('node:fs');
+            fs.writeFileSync(process.argv[2], JSON.stringify({
+                Ambient: process.env[{{JsonSerializer.Serialize(ambient)}}] ?? null,
+                Selected: process.env.LLMWORKGUI_SELECTED ?? null,
+                Directory: process.cwd(),
+                Home: process.env.HOME ?? null
+            }));
+            process.stdout.write('Listening on http://127.0.0.1:54321\n');
+            setInterval(() => {}, 1000);
             """);
-        await File.WriteAllTextAsync(cli, $"@echo off\r\n\"{powerShell}\" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{script}\"\r\n");
+        await File.WriteAllTextAsync(cli, $"@echo off\r\n\"{node}\" \"{script}\" \"{capture}\"\r\n");
         var environment = new Dictionary<string, string>
         {
             ["SystemRoot"] = Path.GetDirectoryName(Environment.SystemDirectory)!,
@@ -116,7 +122,10 @@ public sealed class OpenCodeOwnedLaunchTests
             {
                 try
                 {
-                    var text = await File.ReadAllTextAsync(path);
+                    await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read,
+                        FileShare.ReadWrite | FileShare.Delete);
+                    using var reader = new StreamReader(stream);
+                    var text = await reader.ReadToEndAsync();
                     _output.WriteLine($"{Path.GetFileName(path)}: {text[..Math.Min(text.Length, 4096)]}");
                 }
                 catch (IOException error)

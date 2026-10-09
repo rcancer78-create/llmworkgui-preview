@@ -214,7 +214,7 @@ public sealed partial class OpenCodeServerManagerTests
             (_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
         using var httpClient = new HttpClient(handler) { Timeout = Timeout.InfiniteTimeSpan };
         var manager = CreateManager(
-            fakeServer.ScriptPath,
+            fakeServer,
             dataDirectory.Root,
             httpClient,
             new FixedProcessIdResolver(4242),
@@ -253,7 +253,7 @@ public sealed partial class OpenCodeServerManagerTests
         using var dataDirectory = new TestDirectory();
         using var httpClient = CreateHttpClient();
         var manager = CreateManager(
-            fakeServer.ScriptPath,
+            fakeServer,
             dataDirectory.Root,
             httpClient,
             new FixedProcessIdResolver(null),
@@ -279,7 +279,7 @@ public sealed partial class OpenCodeServerManagerTests
         using var dataDirectory = new TestDirectory();
         using var httpClient = CreateHttpClient();
         var manager = CreateManager(
-            fakeServer.ScriptPath,
+            fakeServer,
             dataDirectory.Root,
             httpClient,
             new FixedProcessIdResolver(null),
@@ -370,7 +370,7 @@ public sealed partial class OpenCodeServerManagerTests
             (_, _) => throw new HttpRequestException("connection refused"));
         using var httpClient = new HttpClient(handler) { Timeout = Timeout.InfiniteTimeSpan };
         var manager = CreateManager(
-            fakeServer.ScriptPath,
+            fakeServer,
             dataDirectory.Root,
             httpClient,
             new FixedProcessIdResolver(11),
@@ -398,7 +398,7 @@ public sealed partial class OpenCodeServerManagerTests
             (_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
         using var httpClient = new HttpClient(handler) { Timeout = Timeout.InfiniteTimeSpan };
         var manager = CreateManager(
-            fakeServer.ScriptPath,
+            fakeServer,
             dataDirectory.Root,
             httpClient,
             new FixedProcessIdResolver(12),
@@ -416,7 +416,7 @@ public sealed partial class OpenCodeServerManagerTests
     }
 
     private static OpenCodeServerManager CreateManager(
-        string executablePath,
+        OpenCodeFakeServer fakeServer,
         string appDataDirectory,
         HttpClient httpClient,
         IProcessIdResolver processIdResolver,
@@ -424,14 +424,14 @@ public sealed partial class OpenCodeServerManagerTests
     {
         var options = new OpenCodeServerOptions
         {
-            CustomExecutablePath = executablePath,
+            CustomExecutablePath = fakeServer.ScriptPath,
             StartupTimeout = startupTimeout,
             DisposeTimeout = TimeSpan.FromSeconds(5)
         };
 
         return new OpenCodeServerManager(
             Options.Create(options),
-            CreateSupervisor(appDataDirectory),
+            CreateSupervisor(appDataDirectory, fakeServer),
             new StubDiscoveryService(
                 OpenCodeDiscoveryResult.NotInstalled("discovery is not expected with a custom executable path.")),
             httpClient,
@@ -439,14 +439,15 @@ public sealed partial class OpenCodeServerManagerTests
             logger: NullLogger<OpenCodeServerManager>.Instance);
     }
 
-    private static ProcessSupervisor CreateSupervisor(string appDataDirectory)
+    private static ProcessSupervisor CreateSupervisor(string appDataDirectory, OpenCodeFakeServer? fakeServer = null)
     {
         return new ProcessSupervisor(
             Options.Create(new ProcessSupervisorOptions
             {
                 GracefulShutdownTimeout = TimeSpan.FromMilliseconds(500)
             }),
-            new StorageOptions { AppDataDirectory = appDataDirectory });
+            new StorageOptions { AppDataDirectory = appDataDirectory }, null, null,
+            process => fakeServer?.StartProcess(process) ?? process.Start());
     }
 
     private static HttpClient CreateHttpClient()

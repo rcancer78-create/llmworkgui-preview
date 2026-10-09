@@ -309,11 +309,12 @@ public sealed partial class OpenCodeServerManagerTests
         using var fake=new OpenCodeFakeServer("Listening on http://127.0.0.1:54321"); using var data=new TestDirectory();
         var entered=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         using var release=new ManualResetEventSlim(); Process? owned=null; var starts=0;
+        var startupClock = new ControlledStartupClock(TimeSpan.FromMilliseconds(50));
         var real=new ProcessSupervisor(Options.Create(new ProcessSupervisorOptions { StartupTimeout=TimeSpan.FromMilliseconds(50),GracefulShutdownTimeout=TimeSpan.FromMilliseconds(100) }),
-            new StorageOptions { AppDataDirectory=data.Root },null,null,process=>
+            new StorageOptions { AppDataDirectory=data.Root },startupClock,null,process=>
             {
                 if(Interlocked.Increment(ref starts)==1) { entered.TrySetResult(); release.Wait(); }
-                var ok=process.Start(); if(starts==1) { owned=Process.GetProcessById(process.Id); _=owned.SafeHandle; } return ok;
+                var ok=fake.StartProcess(process); if(starts==1) { owned=Process.GetProcessById(process.Id); _=owned.SafeHandle; } return ok;
             });
         var supervisor=new ObservedRealSupervisor(real); using var http=CreateHttpClient();
         var manager=new OpenCodeServerManager(Options.Create(new OpenCodeServerOptions
@@ -322,7 +323,12 @@ public sealed partial class OpenCodeServerManagerTests
         var first=manager.StartServerAsync();
         try
         {
-            await entered.Task.WaitAsync(TimeSpan.FromSeconds(3)); await Assert.ThrowsAsync<TimeoutException>(()=>first);
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            // Expire the original 50 ms budget only after the deliberately blocked
+            // native call entered. A later ordinary OS launch must not race that
+            // artificial budget; the manager still has its real five-second bound.
+            startupClock.Expire();
+            await Assert.ThrowsAsync<TimeoutException>(()=>first);
             Assert.Equal(1,manager.PendingStartupCleanupCount); Assert.Equal(1,supervisor.CleanupWaits);
             await Assert.ThrowsAsync<InvalidOperationException>(()=>manager.StartServerAsync()); Assert.Equal(1,starts);
         }
@@ -347,12 +353,37 @@ public sealed partial class OpenCodeServerManagerTests
         finally { owned?.Dispose(); }
     }
 
+    private sealed class ControlledStartupClock(TimeSpan expectedBudget) : TimeProvider
+    {
+        private Action? _expire;
+
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+            Assert.Equal(expectedBudget, dueTime);
+            Assert.Equal(Timeout.InfiniteTimeSpan, period);
+            var timer = new StartupTimer();
+            _expire = () => { if (!timer.IsDisposed) callback(state); };
+            return timer;
+        }
+
+        public void Expire() => (_expire ?? throw new InvalidOperationException("No startup timer is armed."))();
+
+        private sealed class StartupTimer : ITimer
+        {
+            private int _disposed;
+            public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+            public bool Change(TimeSpan dueTime, TimeSpan period) => !IsDisposed;
+            public void Dispose() => Interlocked.Exchange(ref _disposed, 1);
+            public ValueTask DisposeAsync() { Dispose(); return ValueTask.CompletedTask; }
+        }
+    }
+
     [Fact]
     public async Task RealSupervisorPostStartSpoolFailureCleanupIsObservedBeforeStartupOwnerIsReleased()
     {
         using var fake=new OpenCodeFakeServer("Listening on http://127.0.0.1:54321"); using var data=new TestDirectory(); Process? owned=null;
         var real=new ProcessSupervisor(Options.Create(new ProcessSupervisorOptions { GracefulShutdownTimeout=TimeSpan.FromMilliseconds(100) }),new StorageOptions { AppDataDirectory=data.Root },null,null,
-            process=> { var ok=process.Start(); owned=Process.GetProcessById(process.Id); _=owned.SafeHandle; return ok; });
+            process=> { var ok=fake.StartProcess(process); owned=Process.GetProcessById(process.Id); _=owned.SafeHandle; return ok; });
         var supervisor=new ObservedRealSupervisor(real,spec=>Directory.CreateDirectory(Path.Combine(AppDataPaths.GetRunDirectory(data.Root,spec.ExecutionId),ProcessSupervisorOptions.StandardOutputFileName)));
         using var http=CreateHttpClient(); var manager=new OpenCodeServerManager(Options.Create(new OpenCodeServerOptions
         { CustomExecutablePath=fake.ScriptPath,StartupTimeout=TimeSpan.FromSeconds(5),DisposeTimeout=TimeSpan.FromSeconds(5) }),supervisor,
