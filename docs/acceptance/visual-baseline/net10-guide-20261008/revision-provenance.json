@@ -1,0 +1,878 @@
+{
+  "scope": "Offline help toolbar addition; six workspace renders include propagated navigation wrapping shifts. Cursor/Mirasim and narrow graph header fixes are covered by separate shown-window and layout tests.",
+  "priorRevision": "docs/acceptance/visual-baseline/net10-runtime-20261006-secrets",
+  "newRevision": "docs/acceptance/visual-baseline/net10-guide-20261008",
+  "comparisonSource": "artifacts/unified-guide/full-ui-tests/screenshots/ui-inspector",
+  "changed": [
+    {
+      "file": "mainwindow_healthcenter_dark_100dpi.png",
+      "changedPixels": 14201,
+      "bounds": [
+        16,
+        26,
+        1267,
+        86
+      ],
+      "oldSha256": "2724bfdb4c86ac92f6251cd8324e9375ed9c60cef31b33c0ed1e20d163d2113b",
+      "newSha256": "54ea23f15c65551e79eacf885fd24b39cb75fda742d12cc916c3d1e2183908cc"
+    },
+    {
+      "file": "mainwindow_healthcenter_dark_150dpi.png",
+      "changedPixels": 30772,
+      "bounds": [
+        25,
+        39,
+        1901,
+        127
+      ],
+      "oldSha256": "8f1c06ae26210e7e672a56d9c28664934dd77967eb6f3f74121e8b45148d1bb5",
+      "newSha256": "5d3607a8c1e8066746a839e760ee4cb2a24a61bf9fb08f7bbfabd3a7b7b8a78d"
+    },
+    {
+      "file": "mainwindow_healthcenter_dark_200dpi.png",
+      "changedPixels": 54747,
+      "bounds": [
+        33,
+        52,
+        2534,
+        170
+      ],
+      "oldSha256": "dd510ca3a0e5c44af09772ea8101ecd54cc582e3beecae4f9aeaec07491723cb",
+      "newSha256": "f150f4dd862f01faa66d506cec71166e6cb57c9bc6474c8eb3178faebca6704a"
+    },
+    {
+      "file": "mainwindow_healthcenter_light_100dpi.png",
+      "changedPixels": 14191,
+      "bounds": [
+        16,
+        26,
+        1267,
+        86
+      ],
+      "oldSha256": "4fdbd6aaa468a5d3e3a480af159dbd51321c57ecad88186c84706bbc86d5f7e3",
+      "newSha256": "cd13ddf82fb3d0a9787c617fbe2ca30c0018d2620709cf88bdeaeae2abcab6a7"
+    },
+    {
+      "file": "mainwindow_healthcenter_light_150dpi.png",
+      "changedPixels": 30775,
+      "bounds": [
+        25,
+        39,
+        1901,
+        127
+      ],
+      "oldSha256": "e4c52277fd7d01d0a5627f006b0628db4aaef032ccd53d80da082ba5aeedcddb",
+      "newSha256": "3b91531dffcbb07a16f36b0a00a527fd9bf5911a78d537e1cc4de8eb041b6667"
+    },
+    {
+      "file": "mainwindow_healthcenter_light_200dpi.png",
+      "changedPixels": 54780,
+      "bounds": [
+        33,
+        52,
+        2534,
+        170
+      ],
+      "oldSha256": "d064e7371ebd46bd0212cb7aa592b16760e64f9e456ae7a124100bb650daa2a1",
+      "newSha256": "4b781584f890a00ff52d232c7e61dc04d794d35b8cbdbb909a79831155edba47"
+    },
+    {
+      "file": "mainwindow_models_dark_100dpi.png",
+      "changedPixels": 7366,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "7e4ca03016854a98f6789e51700f2f91b83baeed9224a08c0ba6adad260609c4",
+      "newSha256": "dee3aca56b20b50791a38266b1a9ce53db60998f05cfa0d90713f7db792149db"
+    },
+    {
+      "file": "mainwindow_models_dark_150dpi.png",
+      "changedPixels": 16558,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "1277b024982589a238418ed7ebbbf0e71ec62a6e9da7d01c7d2a591246096cbe",
+      "newSha256": "f8dfe6e645f05ab3dc10101391b7d85bd8792443645263f14eade45941a38ace"
+    },
+    {
+      "file": "mainwindow_models_dark_200dpi.png",
+      "changedPixels": 28924,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "914c3c8eaa945348bb952ae2424cb61dac4aa69218f49a122e7b03d5225e2647",
+      "newSha256": "04d51ee5abd75d557d1b5f95e065dc3c927a41959cc2638878c34c9ebba307ac"
+    },
+    {
+      "file": "mainwindow_models_light_100dpi.png",
+      "changedPixels": 7363,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "c14e5dd31da340b44d4b06ec53169a9bbcdce1f1e65339ae89b566ca54e84ad2",
+      "newSha256": "8171085ce6f1b22ef0d0dd5aec5b8557757a4a024afbee53e65c149f6e81d756"
+    },
+    {
+      "file": "mainwindow_models_light_150dpi.png",
+      "changedPixels": 16589,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "3877734665ac1b413a31c12e4d33e73c92b03808c70d5141ccfbac481a4906bc",
+      "newSha256": "0f0561348e47ed06b24564ec03213984baeaae3ff557562af408b6d0a1ffc56b"
+    },
+    {
+      "file": "mainwindow_models_light_200dpi.png",
+      "changedPixels": 29008,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "2cf901b95cd645f3a9ced43c7d1d83276fc5b747e8b9e03aecc99b61fd3f7354",
+      "newSha256": "857f06846abdc977394108cea0906de887238636fa47272f8b1a9ca477e65184"
+    },
+    {
+      "file": "mainwindow_projects_dark_100dpi.png",
+      "changedPixels": 7366,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "55de0568a659ce77aece951ee462fd0c230164bb7e5d2dca636d6fa702ccf327",
+      "newSha256": "06eb3ff4caefe4773f4d32a71e48e17a7ac9dc0232bc6f032cc3ae579ac48fe1"
+    },
+    {
+      "file": "mainwindow_projects_dark_150dpi.png",
+      "changedPixels": 16558,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "8be0739efdba03259212dbd9e719ed423ff368b6f840ae12fd4f3fca80c5e934",
+      "newSha256": "e05a598009bd9b26eef16bed083b4734387893b768c1472c76c4fb4fd3aa4fc0"
+    },
+    {
+      "file": "mainwindow_projects_dark_200dpi.png",
+      "changedPixels": 28924,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "d91d9862dece0710773a7e77e0bd73257282e12ba89d0c46e190c73a74079615",
+      "newSha256": "387760b77edd981785e3e1ed97ca5098f1b7dc14d5f0b8c293870c89404b820e"
+    },
+    {
+      "file": "mainwindow_projects_light_100dpi.png",
+      "changedPixels": 7363,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "9c7b51d8396ffb959037e6b69fe358713aa39eb23b59be3303fb5cd2ab83ddf9",
+      "newSha256": "2bfc54726742221965e7a7fa28b20d3428c951910c7a6be3ce94b6229b06a6ae"
+    },
+    {
+      "file": "mainwindow_projects_light_150dpi.png",
+      "changedPixels": 16589,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "c6bbfe1af05c5a3a8b23da1096975a1f8292b5cac5a5224163e62c76abd7357b",
+      "newSha256": "e7a49e1b93af96670d3886470f21429e96730daf7861bb822f80ecb424c3054b"
+    },
+    {
+      "file": "mainwindow_projects_light_200dpi.png",
+      "changedPixels": 29008,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "99907146fe13e520c009c8e619c2492116ecff46de5fe90cc39695373e806f8b",
+      "newSha256": "0b83844f40df6f679ff156fdee730de8079a7f103d0afa177678a32447e1d075"
+    },
+    {
+      "file": "mainwindow_providersaccounts_dark_100dpi.png",
+      "changedPixels": 7366,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "7f605751dc8b6a302961414aa2cd1ad6a05af4adca67e62775910ab45123cf8c",
+      "newSha256": "01c22cf521355377cffb0052f3315e45d2f1d6c87b60e24a2c6141a2d9da4751"
+    },
+    {
+      "file": "mainwindow_providersaccounts_dark_150dpi.png",
+      "changedPixels": 16558,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "7d5653a58a9dd1985b279d95148b37dfdfbcf4b809de5de660fbbc8ab902711d",
+      "newSha256": "4d60db8477fe0dd53030cc26f47bd2a1e75d7f94405e628feac6ffd23043f0ca"
+    },
+    {
+      "file": "mainwindow_providersaccounts_dark_200dpi.png",
+      "changedPixels": 28924,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "5edc7b16e77732e4814abff8d4c9a3ca105320c55f7dec38c93d31a949408eb0",
+      "newSha256": "c7ce60cfde13b9ab7b8a790cb241d070d1897ecc1f8c2102af4b31573cdf07fb"
+    },
+    {
+      "file": "mainwindow_providersaccounts_light_100dpi.png",
+      "changedPixels": 7363,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "c18e386ad5e4f1511341a163b864b80dd10240f8801d83e7263a9340f38eb5de",
+      "newSha256": "e4fdb894b47163ada01e239c60ea7b0637d2f9fd67930d414485c6f196dd6cd4"
+    },
+    {
+      "file": "mainwindow_providersaccounts_light_150dpi.png",
+      "changedPixels": 16589,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "559e7f5d1804ceb33b0b2b7b0a6a301cecc209bb09284bc66d3ac1371c81189e",
+      "newSha256": "4ebe11d42fcfd30f479804a7457b1e7b128a7c96001870777d4b83fae453d64e"
+    },
+    {
+      "file": "mainwindow_providersaccounts_light_200dpi.png",
+      "changedPixels": 29008,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "53f28a94a038833026cbe8107e4087ead4fc9c8492391b2c5315f44cf1562af7",
+      "newSha256": "9dcc6add022fde566ae677784b23f0b4d45d73cb0a85d654e1f1c87434bbe893"
+    },
+    {
+      "file": "mainwindow_quotas_dark_100dpi.png",
+      "changedPixels": 7366,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "7ef7009e50725e954718537aacbb4b1a425594ec6da2f2f8b38791a1875930f0",
+      "newSha256": "0c52afd046cb979b2a671e8448b5996f13a4c98690bbb11283bd79d651825972"
+    },
+    {
+      "file": "mainwindow_quotas_dark_150dpi.png",
+      "changedPixels": 16558,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "fdb5c42921ea30af8bcb2d5721930e7b8626d2eeb6a154a81ab7c517757bd2e6",
+      "newSha256": "c22ba2606cc1dc16a2dbbf03ea04c05139dbd5ed721e4af5c2c01663104c9400"
+    },
+    {
+      "file": "mainwindow_quotas_dark_200dpi.png",
+      "changedPixels": 28924,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "5f5ba5a1891bd5f4a50e6f54616f9875d6ef209cb53ef461e3b6892aa0d0d497",
+      "newSha256": "c062f20e9128efbb84a53e45d9ecd670d8262b6b9a8908262db90dc88a6b5cb2"
+    },
+    {
+      "file": "mainwindow_quotas_light_100dpi.png",
+      "changedPixels": 7363,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "6a2384d65849683863879d55c2d886f5ed1ac6dcc316a653eea327666e5db69c",
+      "newSha256": "2d793780e738a2ab0f74a54baaf22c962d0693f5017febfba17a515486a1dfe0"
+    },
+    {
+      "file": "mainwindow_quotas_light_150dpi.png",
+      "changedPixels": 16589,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "02e44e0119cc74bd9e0e540f0a42d851067e9be5ab0e4b510f109e8bcde4d215",
+      "newSha256": "eb363e5db9dace80fe513834eb0ff96acb71afe09c0c9f8af5a2b4aac18af80b"
+    },
+    {
+      "file": "mainwindow_quotas_light_200dpi.png",
+      "changedPixels": 29008,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "fdf8657cc33eca27645d001b7ec96069cdc62cccddf8e188b7fd0e8fe3893b66",
+      "newSha256": "9e199bb071041d9b97ee69fffc02e45be0e7b60dc33dd743a29345047f27cef2"
+    },
+    {
+      "file": "mainwindow_runs_dark_100dpi.png",
+      "changedPixels": 7366,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "b5f4af26b67890a169dc6ca30737e524b69e6a7c293844c0adea59e4ecfa2cd9",
+      "newSha256": "c170b301d4f43186e1316af3217f91950e07b57d5708f6f6a36757d1be216a98"
+    },
+    {
+      "file": "mainwindow_runs_dark_150dpi.png",
+      "changedPixels": 16558,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "c83b5e7a5fdfa0ed36104f219b3f6593eb5f9cfd8cf595da273b4b837c76cb4e",
+      "newSha256": "35ef2acfdcf438bc3e3583b6ca0ac821e7fca0c11bf79d72dc72bfb3a9b1141f"
+    },
+    {
+      "file": "mainwindow_runs_dark_200dpi.png",
+      "changedPixels": 28924,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "f214097aadb5f19cff03649505e69e1bbe73bc2cf5beb666a59002962941a832",
+      "newSha256": "4af699eb38366548f5d1afba3415ae027e92745f3345c9e73e51bcbe9a19e722"
+    },
+    {
+      "file": "mainwindow_runs_light_100dpi.png",
+      "changedPixels": 7363,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "4264832d79cbd8247017d1fa821570f317fe68744e302d158afff692e9731d05",
+      "newSha256": "29038c9846508dbfd93097265b14decf7b4d6db3cb467e902894205c5265b2d0"
+    },
+    {
+      "file": "mainwindow_runs_light_150dpi.png",
+      "changedPixels": 16589,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "e6c7e891ab3e19104bb44046e329f5ddcab80c5f85f7252de5e75edb9d26f0f8",
+      "newSha256": "678762dc132909728fdca67e3dbc88ced06a9701c8e2bf28bed7ca0f8cf358a4"
+    },
+    {
+      "file": "mainwindow_runs_light_200dpi.png",
+      "changedPixels": 29008,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "142c1fca8c2723f8c5ec62daeb3c73949c35b1a84a7e31bf4aaf46fe84b77b79",
+      "newSha256": "b66bace998aecf0a2c1c7b528f7a634c49b08dfdfef21b952a92f5f8721c06b1"
+    },
+    {
+      "file": "mainwindow_sessions_dark_100dpi.png",
+      "changedPixels": 7366,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "b6d04a2e28d8f4095a7b15fa9791a189acdf84ba08845548fde1f784f543b1e8",
+      "newSha256": "e1562b3ddf75cbdf5b912dcd13f619ed4aa9e1a62978a0a5968f4a489b7e61d5"
+    },
+    {
+      "file": "mainwindow_sessions_dark_150dpi.png",
+      "changedPixels": 16558,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "e38e3c93c4eeb907abf899639ffc7dc4dce8178172aab834859f482f81ee36be",
+      "newSha256": "19fccdd141117548ae5a7f1edbb1ea78ed5205da55de2ff68cf40137de17ee9e"
+    },
+    {
+      "file": "mainwindow_sessions_dark_200dpi.png",
+      "changedPixels": 28924,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "51d0726b8c5a441db88ad01f7e999c8637cfa9821f8880741cf38bf77ad7bd58",
+      "newSha256": "45b5a33eee3b1e3e67cbf897721f6de667ccd0d4702b79cadaccca270b0c9507"
+    },
+    {
+      "file": "mainwindow_sessions_light_100dpi.png",
+      "changedPixels": 7363,
+      "bounds": [
+        28,
+        26,
+        1267,
+        77
+      ],
+      "oldSha256": "3989647aa30b4f873f71b55eddef2685ac6469b63bd87314ec85b5225833d983",
+      "newSha256": "9b681f41ffe5eb83c219666cc05b6cdfb872dfd032041e521946582ffd39f8a3"
+    },
+    {
+      "file": "mainwindow_sessions_light_150dpi.png",
+      "changedPixels": 16589,
+      "bounds": [
+        42,
+        39,
+        1901,
+        114
+      ],
+      "oldSha256": "4efdc0fc00f671c55864aeb827dd706fe13a3112a72d7590fe5d6be1cb5b7161",
+      "newSha256": "e5bca3afc38cb756fca9c0d0524c9c6a0f1585c378adc241dff1c291ff5fc46e"
+    },
+    {
+      "file": "mainwindow_sessions_light_200dpi.png",
+      "changedPixels": 29008,
+      "bounds": [
+        55,
+        52,
+        2534,
+        152
+      ],
+      "oldSha256": "2217a8a4aeda0262b885962a59c1001c78b21d337378aa93f05329d04fa4b373",
+      "newSha256": "f8cb08cb17ffe41fe992b3de43806b0eb213df4d87233508dd04404e99a491cf"
+    },
+    {
+      "file": "mainwindow_settingsdiagnostics_dark_100dpi.png",
+      "changedPixels": 14242,
+      "bounds": [
+        28,
+        26,
+        1267,
+        86
+      ],
+      "oldSha256": "4f0269a389eb3df84ba03876427d2e8b9bd333154a55b65b2f224625af4fc844",
+      "newSha256": "bfe33b5c0bbc27658f92cd0f14c0fd47d90e6c3b2dbfceaa7c0a047d5923e195"
+    },
+    {
+      "file": "mainwindow_settingsdiagnostics_dark_150dpi.png",
+      "changedPixels": 30913,
+      "bounds": [
+        42,
+        39,
+        1901,
+        127
+      ],
+      "oldSha256": "c7213c960a64a642345b16d4b2797a117acd0c73a8989642695a2095bcada6f2",
+      "newSha256": "e64057b151ea8bdb56daa6ec836d73c69519e6ba9fbb7f5e98a94bb2388cedfa"
+    },
+    {
+      "file": "mainwindow_settingsdiagnostics_dark_200dpi.png",
+      "changedPixels": 54866,
+      "bounds": [
+        55,
+        52,
+        2534,
+        170
+      ],
+      "oldSha256": "a6b746ff01c670d0446a4638aa8ecc1c2168a55cfc7b2eeff58446ed5226faeb",
+      "newSha256": "7e59160a3dfcffa9529f35762da8c31038e9e3277d2ed0665f291bf1f70cb7c3"
+    },
+    {
+      "file": "mainwindow_settingsdiagnostics_light_100dpi.png",
+      "changedPixels": 14235,
+      "bounds": [
+        28,
+        26,
+        1267,
+        86
+      ],
+      "oldSha256": "72750b2a0bccef1d290eb5ab153658519b1f0104e44d6c4541e06302de8a9aab",
+      "newSha256": "88250bb5b89a8113efab825e9d7f59a09aff01428e15d3b06c0858704f7ec264"
+    },
+    {
+      "file": "mainwindow_settingsdiagnostics_light_150dpi.png",
+      "changedPixels": 30903,
+      "bounds": [
+        42,
+        39,
+        1901,
+        127
+      ],
+      "oldSha256": "1823b3386713dfeecc8e78b0e50ae3389e662fc3ebd15ab4c79280db9d187853",
+      "newSha256": "3fae63ee5626029eea8af9020b376578f55e54654a716b6e6df01fae3aa601c4"
+    },
+    {
+      "file": "mainwindow_settingsdiagnostics_light_200dpi.png",
+      "changedPixels": 54877,
+      "bounds": [
+        55,
+        52,
+        2534,
+        170
+      ],
+      "oldSha256": "320a561492a1ff54d147118dbfa320455911462adc027018547ed49520b1a35b",
+      "newSha256": "ff20b110cf2faf64e6232237aaf0dc870cef1b84d727e3e6b40acafb05738753"
+    },
+    {
+      "file": "mainwindow_workflowadaptationdialog_dark_100dpi.png",
+      "changedPixels": 13379,
+      "bounds": [
+        16,
+        14,
+        1267,
+        86
+      ],
+      "oldSha256": "dcbe2d36f4a7a121536205875c167fde9b66415f8d995e9dc89088e6c69ad738",
+      "newSha256": "ccbee5724982eddfe909d02e491ec6dcffa1fc7e1c3563b7c166987c53bae301"
+    },
+    {
+      "file": "mainwindow_workflowadaptationdialog_dark_150dpi.png",
+      "changedPixels": 29435,
+      "bounds": [
+        25,
+        21,
+        1901,
+        127
+      ],
+      "oldSha256": "2f8deb540624764ef66686ec2ccb96bbd9e849bb6e005fce7348033f4b797f3d",
+      "newSha256": "10e8ebef279fcfdd9f15f15cd503c8ed78fb97e36cb0c3a80d32af25503425e9"
+    },
+    {
+      "file": "mainwindow_workflowadaptationdialog_dark_200dpi.png",
+      "changedPixels": 52056,
+      "bounds": [
+        33,
+        28,
+        2534,
+        170
+      ],
+      "oldSha256": "7882d34b544c4d828a9a7f570ccbd2a4dd46a92a73c300fca0eaa0675bae9cb1",
+      "newSha256": "3135e7177a82bc074bb87e0ebc0acead554f52db75f5361e9ecbccc57ec065e2"
+    },
+    {
+      "file": "mainwindow_workflowadaptationdialog_light_100dpi.png",
+      "changedPixels": 13366,
+      "bounds": [
+        16,
+        14,
+        1267,
+        86
+      ],
+      "oldSha256": "34b1fb33954dc44832d7f22b4b2de0eec27e145dfdaa749fc6e0a7f24a65e116",
+      "newSha256": "0a9b3c5bd69dedc5fba16d311c4ed75cb684ef1d39236bb4d9f8b0f57850ecf5"
+    },
+    {
+      "file": "mainwindow_workflowadaptationdialog_light_150dpi.png",
+      "changedPixels": 29452,
+      "bounds": [
+        25,
+        21,
+        1901,
+        127
+      ],
+      "oldSha256": "956e35535a4d05b3c26ecbba6d809476b09d0e6627a782c5a7420b725655f421",
+      "newSha256": "7875904d6dd68addb0cc24279f40d2d972d8dcdd3fd8686dff3b8ad9c4f789ea"
+    },
+    {
+      "file": "mainwindow_workflowadaptationdialog_light_200dpi.png",
+      "changedPixels": 52104,
+      "bounds": [
+        33,
+        28,
+        2534,
+        170
+      ],
+      "oldSha256": "26945e39a343522d324d3b7e39288fd8fb8d05867a3d47a4bf35530ce34fc5e9",
+      "newSha256": "9d2d4c3f872c7370b42dafe68d1484dff072ad508eadeca1936ba5a13b53df6d"
+    },
+    {
+      "file": "mainwindow_workflows_dark_100dpi.png",
+      "changedPixels": 13379,
+      "bounds": [
+        16,
+        14,
+        1267,
+        86
+      ],
+      "oldSha256": "0743ba8ef836f72b7095fc37d42531cdef0b8f147324cc1a5a0bf5002ebaae6c",
+      "newSha256": "3e3187b0a51eb4fc0b80523029f5794af1b6c4619abb837e019854cb9e5fc3b3"
+    },
+    {
+      "file": "mainwindow_workflows_dark_150dpi.png",
+      "changedPixels": 29435,
+      "bounds": [
+        25,
+        21,
+        1901,
+        127
+      ],
+      "oldSha256": "8c083177142958a84a74c9ae16e67e1459f77b072e7e0f72e42136309bf3e45f",
+      "newSha256": "2ae50d3e1ead098992e745e2129bcd98a3dd8ea38da0130d7a578bf3200f70ca"
+    },
+    {
+      "file": "mainwindow_workflows_dark_200dpi.png",
+      "changedPixels": 52056,
+      "bounds": [
+        33,
+        28,
+        2534,
+        170
+      ],
+      "oldSha256": "9a44fac5c0a1c8b1e76931047d98e95d02655cf9dac36779345b997cbefc9625",
+      "newSha256": "142cce4ab74483bd0a8e6a9f4075b878f02196dd85da6c02b80c1ce14f8d8b4d"
+    },
+    {
+      "file": "mainwindow_workflows_light_100dpi.png",
+      "changedPixels": 13366,
+      "bounds": [
+        16,
+        14,
+        1267,
+        86
+      ],
+      "oldSha256": "bc3eebba4fc9f6aad9db7cb131b6387742fdef6d18837c1d777b5245b560078e",
+      "newSha256": "df1b281975732b81f73a44f17cce985588a82af205b88eed598e628e85e0e2f2"
+    },
+    {
+      "file": "mainwindow_workflows_light_150dpi.png",
+      "changedPixels": 29452,
+      "bounds": [
+        25,
+        21,
+        1901,
+        127
+      ],
+      "oldSha256": "02590efa7d35fab92da189bad7f03d841466d14d14c32d3183cbedba75abb1cd",
+      "newSha256": "555ddd9ebd2fc03c09f01158dc8327dbf49ed87dc7ea3bd8b06da36e366d8b2b"
+    },
+    {
+      "file": "mainwindow_workflows_light_200dpi.png",
+      "changedPixels": 52104,
+      "bounds": [
+        33,
+        28,
+        2534,
+        170
+      ],
+      "oldSha256": "b56a60c170a3bc11caad79ddb1794f0967524483accb7c7a0a3bac85ce3be3aa",
+      "newSha256": "bae519e18f57ff7453df1975860ae1e8f0f0ddbbcab8180b4e2257c6160ceada"
+    },
+    {
+      "file": "mainwindow_workspace_dark_100dpi.png",
+      "changedPixels": 7400,
+      "bounds": [
+        28,
+        26,
+        1267,
+        347
+      ],
+      "oldSha256": "7c44f3a1416ac202021c698df8ab68b06d5a37631107b17da64b9c09152be546",
+      "newSha256": "08714798f5bc027717732617e49845e1b6479a6f5f4ca202c3278aa33d721813"
+    },
+    {
+      "file": "mainwindow_workspace_dark_150dpi.png",
+      "changedPixels": 16621,
+      "bounds": [
+        42,
+        39,
+        1901,
+        521
+      ],
+      "oldSha256": "23eafcdd2941d0e71c5e4891142d1feb6d54dbfe7c0aaa3c0ac2c8aa02b7aa71",
+      "newSha256": "f76cee39e68f059cf06869faa0987a07d92cb5cc2718b8f9bb720cf5fa4860e5"
+    },
+    {
+      "file": "mainwindow_workspace_dark_200dpi.png",
+      "changedPixels": 29042,
+      "bounds": [
+        55,
+        52,
+        2534,
+        694
+      ],
+      "oldSha256": "568be47beb1285beec34a2187c0af0956610a4ad731a4dd81457ce5cf932a5a2",
+      "newSha256": "09a7bb071804b989107d9b9a930d9c71bddfddaf5b6ed1f60249beadef56cfb5"
+    },
+    {
+      "file": "mainwindow_workspace_light_100dpi.png",
+      "changedPixels": 7397,
+      "bounds": [
+        28,
+        26,
+        1267,
+        347
+      ],
+      "oldSha256": "2bb364673ac9060a7409aa6de44e9682cf1b94e6e1cf1a5a0437b2a9585cf7ea",
+      "newSha256": "ee55e057be3b5357cbca7a9f136675c810f16b3d37748d1e84e6c62de1d9c43a"
+    },
+    {
+      "file": "mainwindow_workspace_light_150dpi.png",
+      "changedPixels": 16652,
+      "bounds": [
+        42,
+        39,
+        1901,
+        521
+      ],
+      "oldSha256": "07cede9469fcde06eac3f391456f8bb462015a5d4b1b2dc8ce668a9d3ea90f79",
+      "newSha256": "b4857d114c5f48e68401a1115db76eb13e75722d6b91a600ea15f2783816b168"
+    },
+    {
+      "file": "mainwindow_workspace_light_200dpi.png",
+      "changedPixels": 29126,
+      "bounds": [
+        55,
+        52,
+        2534,
+        694
+      ],
+      "oldSha256": "e09ce69e3b011f3e4fe39f76df138ee18a9af5330d435cf4b041fff087366f77",
+      "newSha256": "3f2cc2adf7f8d120f317f58d3ccb9790abd2a36116a3cd98706ef34f163653f2"
+    },
+    {
+      "file": "unifiedshell_threepane_dark_100dpi.png",
+      "changedPixels": 7556,
+      "bounds": [
+        374,
+        10,
+        1022,
+        43
+      ],
+      "oldSha256": "96dfdd93ce0d34d019ac07b8dc46790ef7cc39e4778f40edcc1b1b015a29cf1b",
+      "newSha256": "61b8ffd25a28a6fbdbb396bf7b14fcf8833c99b2dce23c7a7999faba3cae5cca"
+    },
+    {
+      "file": "unifiedshell_threepane_dark_150dpi.png",
+      "changedPixels": 17347,
+      "bounds": [
+        562,
+        14,
+        1532,
+        65
+      ],
+      "oldSha256": "36817656b480ccfc924a31cb926f7188015af72bc8d4177babcd8b7fcbf84d74",
+      "newSha256": "7a864edd70533a5210df78d1e7c8b523c9e93073ae6c15239f06bf78e11e2f9b"
+    },
+    {
+      "file": "unifiedshell_threepane_dark_200dpi.png",
+      "changedPixels": 30357,
+      "bounds": [
+        749,
+        19,
+        2043,
+        86
+      ],
+      "oldSha256": "460dc311dfebccf74e3327e17206a9724304f6eb0f128d0ed1c75da2874a5ee3",
+      "newSha256": "91e9a6e4573e15dc759c388f9ce7b457ad94d58e981352357cb7e0b677854532"
+    },
+    {
+      "file": "unifiedshell_threepane_light_100dpi.png",
+      "changedPixels": 7552,
+      "bounds": [
+        374,
+        10,
+        1022,
+        43
+      ],
+      "oldSha256": "4127ddab7b819e91e2bc14ef42413d9861d470b2e51f4beeb1283f6fd55f316a",
+      "newSha256": "ce1137718de77e46b6f6358fcd5ada13747a4da61d1802501af5794027d56220"
+    },
+    {
+      "file": "unifiedshell_threepane_light_150dpi.png",
+      "changedPixels": 17357,
+      "bounds": [
+        562,
+        14,
+        1532,
+        65
+      ],
+      "oldSha256": "1f92072098afe16c604fa6bc32331cfaddd408673eec7c95059deea3401dc0ff",
+      "newSha256": "db24bf1f57fffb15a59b696804e611e9fa71ef2e441ab654d0ee634ec63b7e43"
+    },
+    {
+      "file": "unifiedshell_threepane_light_200dpi.png",
+      "changedPixels": 30338,
+      "bounds": [
+        749,
+        19,
+        2043,
+        86
+      ],
+      "oldSha256": "c8fb2c47869f262f88109197c1fafca66457a2fb589409bea0cac00a7bca2add",
+      "newSha256": "73cc37fa66203e258587fddfe6e73e8a02a540237d7569f3fc125ad76e2b5d45"
+    }
+  ],
+  "unchangedCount": 42,
+  "clippedCount": 0,
+  "leaksCount": 0,
+  "visualReview": "All 24 changed family/theme comparisons at 100 DPI reviewed; 150/200 DPI pixel bounds inspected. Separate full UI walk reviews actual production windows.",
+  "osMouseSimulation": false,
+  "ownerSignoff": false
+}

@@ -1,0 +1,57 @@
+# Exact nonproduction fixture values reviewed for the public source snapshot.
+# Default detectors remain enabled; there are no path or rule exclusions.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Invalid credential-shaped test fixtures used by redaction, scanner and persistence tests"
+regexTarget = "secret"
+regexes = [
+  # CredentialFormatBoundaryReviewTests.cs
+  '''^-----BEGIN EC PRIVATE KEY-----\\nowned-synthetic-placeholder\\n-----END EC PRIVATE KEY-----"\)\]\r\n    \[InlineData\("-----BEGIN OPENSSH PRIVATE KEY-----$''',
+  # R4SdkReviewRegressionTests.cs
+  '''^-----BEGIN EC PRIVATE KEY-----\\nsynthetic-fixture\\n-----END EC PRIVATE KEY-----"\)\]\n    \[InlineData\("NOTE", "-----BEGIN ENCRYPTED PRIVATE KEY-----$''',
+  # WorkflowSecretScannerTests.cs
+  '''^AIzaSyA1234567890abcdefghijklmnopqrstu$''',
+  # NativeCredentialEnvironmentTests.cs
+  '''^ApiKeyVariable=variable$''',
+  # ActivityCenterRedactionBoundaryTests.cs, ActivityLoadEventFactory.cs
+  '''^Hunter2Correct-Horse-Battery$''',
+  # ActivityCenterRedactionBoundaryTests.cs, ActivityLoadEventFactory.cs
+  '''^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJzdWIiOiJsbG13b3JrZ3VpIn0\.dBjftJeZ4CVPmB92K27uhbUJU1p1r_wW1gFWFOEjXk$''',
+  # EventSearchIndexTests.cs
+  '''^eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiIxMjM0NTY3ODkwIn0\.dozjgNryP4J3jVmNHl0w5N$''',
+  # StandalonePersistenceReviewRegressionTests.cs
+  '''^eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiJmaXh0dXJlIn0\.c3ludGhldGlj$''',
+  # CredentialFormatBoundaryReviewTests.cs
+  '''^eyJvd25lZCI6dHJ1ZX0\.eyJmaXh0dXJlIjp0cnVlfQ\.b3duZWRub3Rhc2lnbmF0dXJl$''',
+  # CredentialFormatBoundaryReviewTests.cs
+  '''^eyJvd25lZCI6dHJ1ZX0\.eyJmaXh0dXJlIjp0cnVlfQ\.b3duZWRub3Rhc2lnbmF0dXJl\\r\\n$''',
+  # CredentialFormatBoundaryReviewTests.cs
+  '''^eyJvd25lZCI6dHJ1ZX0\.eyJmaXh0dXJlIjp0cnVlfQ\.b3duZWRub3Rhc2lnbmF0dXJl\\t$''',
+  # DiagnosticCredentialScannerReviewTests.cs
+  '''^eyJvd25lZCI6dHJ1ZX0\.eyJmaXh0dXJlIjp0cnVlfQ\.ownedSyntheticSignature$''',
+  # BackendAdaptationModelInvokerTests.Egress.cs
+  '''^sk-0123456789abcdef0123456789abcdef$''',
+  # DiagnosticBundleServiceTests.cs
+  '''^sk-1234567890abcdefgh$''',
+  # ProviderModelCatalogTests.cs, WorkflowActivationServiceTests.cs, WorkflowAdaptationPromptBuilderTests.cs, WorkflowAdaptationServiceTests.cs, WorkflowAdaptationViewModelTests.cs, WorkflowSecretScannerTests.BomlessD022.cs, WorkflowSecretScannerTests.cs
+  '''^sk-abcdefgh12345678$''',
+  # ActivityCenterShellIntegrationTests.cs
+  '''^sk-composition-1234567890$''',
+  # EventSearchIndexTests.cs
+  '''^sk-live-1234567890abcdef$''',
+  # ActivityCenterRedactionBoundaryTests.cs, ActivityLoadEventFactory.cs
+  '''^sk-live-4f9a1c7b2e8d6035aa11bb22cc33dd44ee55ff660$''',
+  # ActivityCenterServiceTests.cs
+  '''^sk-test-abcdef1234567890$''',
+  # WorkflowSecretScannerTests.cs
+  '''^xoxb-1234567890-abcdefghij$''',
+]
+
+[[allowlists]]
+description = "Exact SHA256 provenance digest of the captured OpenAPI schema"
+regexTarget = "secret"
+regexes = [
+  '''^46DB986090AAE41846CD6DBE16225A1D883F0BBCB4C48814008D3F6CE140AA5C$''',
+]

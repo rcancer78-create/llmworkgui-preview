@@ -1,0 +1,177 @@
+name: Windows preview checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_visual_baseline:
+        description: 'Also run the exact 114-image comparison (requires matching OS/runtime/fonts)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: ${{ matrix.id }}
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: Domain
+            project: tests/LLMWorkGUI.Domain.Tests/LLMWorkGUI.Domain.Tests.csproj
+            filter: ''
+          - id: Application
+            project: tests/LLMWorkGUI.Application.Tests/LLMWorkGUI.Application.Tests.csproj
+            filter: ''
+          - id: Backends.Contract
+            project: tests/LLMWorkGUI.Backends.ContractTests/LLMWorkGUI.Backends.ContractTests.csproj
+            filter: ''
+          - id: Gateway
+            project: tests/LLMGateway.Tests/LLMGateway.Tests.csproj
+            filter: ''
+          - id: Integration
+            project: tests/LLMWorkGUI.IntegrationTests/LLMWorkGUI.IntegrationTests.csproj
+            filter: 'FullyQualifiedName!~CursorAcpLiveSmokeTests&FullyQualifiedName!~MirasimLiveSmokeTests&Evidence!=ActualOpenCodeNoModel'
+          - id: Ui
+            project: tests/LLMWorkGUI.Ui.Tests/LLMWorkGUI.Ui.Tests.csproj
+            filter: 'FullyQualifiedName!=LLMWorkGUI.Ui.Tests.UiInspectorVisualTests.UiInspector_AllNineteenScreensAcrossThemesAndDpi_ReportsCleanEvidence'
+    env:
+      TEMP: D:\lwt
+      TMP: D:\lwt
+      LLMWORKGUI_SCREENSHOT_DIR: ${{ github.workspace }}/artifacts/ci/${{ matrix.id }}/screenshots
+    steps:
+      - name: Prepare temporary directory
+        run: New-Item -ItemType Directory -Force $env:TEMP | Out-Null
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore
+        run: dotnet restore LLMWorkGUI.sln
+      - name: Build complete solution
+        run: dotnet build LLMWorkGUI.sln -c Release --no-restore
+      - name: Run selected suite and verify TRX
+        shell: pwsh
+        env:
+          SUITE_PROJECT: ${{ matrix.project }}
+          SUITE_NAME: ${{ matrix.id }}
+          SUITE_FILTER: ${{ matrix.filter }}
+        run: |
+          $results = Join-Path $PWD "artifacts/ci/$env:SUITE_NAME"
+          New-Item -ItemType Directory -Force $results | Out-Null
+          $testArgs = @('test', $env:SUITE_PROJECT, '-c', 'Release', '--no-build', '--no-restore', '--logger', 'trx;LogFileName=results.trx', '--results-directory', $results)
+          if ($env:SUITE_FILTER) { $testArgs += @('--filter', $env:SUITE_FILTER) }
+          dotnet @testArgs 2>&1 | Tee-Object -FilePath (Join-Path $results 'tests.log')
+          $testExitCode = $LASTEXITCODE
+          if ($testExitCode -ne 0) { throw "Suite failed with exit code $testExitCode" }
+          [xml]$trx = Get-Content -LiteralPath (Join-Path $results 'results.trx') -Raw
+          $summary = $trx.TestRun.ResultSummary
+          if ([int]$summary.Counters.total -le 0 -or [int]$summary.Counters.passed -ne [int]$summary.Counters.total -or $summary.outcome -ne 'Completed') {
+            throw 'The selected suite did not execute and pass every test; inspect the TRX'
+          }
+      - name: Upload suite evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ matrix.id }}
+          path: artifacts/ci/${{ matrix.id }}/
+          if-no-files-found: warn
+
+  visual-baseline:
+    name: Optional exact visual comparison
+    if: github.event_name == 'workflow_dispatch' && inputs.run_visual_baseline
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      TEMP: D:\lwt
+      TMP: D:\lwt
+      LLMWORKGUI_SCREENSHOT_DIR: ${{ github.workspace }}/artifacts/visual/screenshots
+    steps:
+      - run: New-Item -ItemType Directory -Force $env:TEMP | Out-Null
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run exact image comparison without updating baselines
+        run: dotnet test tests/LLMWorkGUI.Ui.Tests/LLMWorkGUI.Ui.Tests.csproj -c Release --filter 'FullyQualifiedName=LLMWorkGUI.Ui.Tests.UiInspectorVisualTests.UiInspector_AllNineteenScreensAcrossThemesAndDpi_ReportsCleanEvidence' --logger 'trx;LogFileName=visual.trx' --results-directory artifacts/visual
+      - name: Upload visual evidence including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-visual-comparison
+          path: artifacts/visual/
+          if-no-files-found: warn
+
+  package:
+    needs: tests
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+      - name: Publish self-contained Windows preview
+        shell: pwsh
+        run: ./scripts/Publish-LLMWorkGUI.ps1 -Version 0.1.0-preview -OutputDirectory artifacts/LLMWorkGUI-win-x64
+      - name: Assemble documentation, notices, and archive
+        shell: pwsh
+        run: |
+          $output = Join-Path $PWD 'artifacts/LLMWorkGUI-win-x64'
+          Copy-Item README.md, TESTING.md, LICENSE, THIRD_PARTY_NOTICES.md, DATA_STORAGE.md -Destination $output
+          Copy-Item docs -Destination (Join-Path $output 'docs') -Recurse
+          Copy-Item scripts -Destination (Join-Path $output 'scripts') -Recurse
+          $packageNotices = Join-Path $output 'THIRD_PARTY_NOTICES.md'
+          $noticeText = (Get-Content -LiteralPath $packageNotices -Raw).Replace('src/LLMWorkGUI.Infrastructure/GrokBot/Runtime/', 'GrokBot/')
+          Set-Content -LiteralPath $packageNotices -Value $noticeText -Encoding utf8
+          if (-not (Test-Path -LiteralPath (Join-Path $output 'GrokBot/THIRD_PARTY_NOTICES.md'))) {
+            throw 'The embedded Grok Bot third-party attribution is missing from the publish output'
+          }
+          $noticeRoot = Join-Path $output 'third-party'
+          New-Item -ItemType Directory -Force $noticeRoot | Out-Null
+          $assets = Get-Content src/LLMWorkGUI.App/obj/project.assets.json -Raw | ConvertFrom-Json
+          $packageRoots = @($assets.packageFolders.PSObject.Properties.Name)
+          foreach ($library in $assets.libraries.PSObject.Properties) {
+            if ($library.Value.type -ne 'package') { continue }
+            foreach ($packageRoot in $packageRoots) {
+              $packagePath = Join-Path $packageRoot $library.Name.ToLowerInvariant()
+              if (-not (Test-Path -LiteralPath $packagePath)) { continue }
+              $notices = @(Get-ChildItem -LiteralPath $packagePath -File | Where-Object { $_.Name -match '^(license|notice|third[-_]party)' })
+              if ($notices.Count -eq 0) { continue }
+              $destination = Join-Path $noticeRoot $library.Name
+              New-Item -ItemType Directory -Force $destination | Out-Null
+              $notices | Copy-Item -Destination $destination
+            }
+          }
+          foreach ($runtimePack in @('microsoft.netcore.app.runtime.win-x64', 'microsoft.windowsdesktop.app.runtime.win-x64')) {
+            $runtimeNotices = @($packageRoots | ForEach-Object {
+              Get-ChildItem (Join-Path $_ "$runtimePack/10.0.*") -Directory | ForEach-Object {
+                Get-ChildItem -LiteralPath $_.FullName -File | Where-Object { $_.Name -match '^(license|third[-_]party)' }
+              }
+            })
+            if ($runtimeNotices.Count -lt 2) { throw "Expected runtime license and third-party notices were not found for $runtimePack" }
+            foreach ($notice in $runtimeNotices) {
+              $destination = Join-Path $noticeRoot "$runtimePack/$($notice.Directory.Name)"
+              New-Item -ItemType Directory -Force $destination | Out-Null
+              Copy-Item -LiteralPath $notice.FullName -Destination $destination
+            }
+          }
+          Import-Module ./scripts/LLMWorkGUI.Packaging.psm1 -Force
+          Write-LlmPublishedHashes -Directory $output
+          Compress-Archive -Path "$output/*" -DestinationPath artifacts/LLMWorkGUI-win-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LLMWorkGUI-win-x64-preview
+          path: artifacts/LLMWorkGUI-win-x64.zip
+          if-no-files-found: error

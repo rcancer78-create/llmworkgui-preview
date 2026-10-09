@@ -1,0 +1,240 @@
+[
+  {
+    "id": "evt_0fbfd47dc001paeA9ySUKbVsSv",
+    "type": "server.connected",
+    "properties": {}
+  },
+  {
+    "id": "evt_0fbfd4805001HCqh63mkyGz4K0",
+    "type": "message.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "info": {
+        "id": "msg_user",
+        "role": "user",
+        "sessionID": "ses_stream",
+        "time": {
+          "created": 1790934075389
+        },
+        "agent": "build",
+        "model": {
+          "providerID": "xai",
+          "modelID": "grok-4.6"
+        }
+      }
+    }
+  },
+  {
+    "id": "evt_0fbfd499c001RnS7hN0SULMrg4",
+    "type": "message.part.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "part": {
+        "type": "text",
+        "text": "Reply with exactly OPENCODE_WORKSPACE_OK. Do not use tools, read files, run commands, access the network, or modify anything.",
+        "messageID": "msg_user",
+        "sessionID": "ses_stream",
+        "id": "prt_sample_0"
+      },
+      "time": 1790934075804
+    }
+  },
+  {
+    "id": "evt_0fbfd49aa0017BxecFMXxbfEmw",
+    "type": "message.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "info": {
+        "id": "msg_assistant",
+        "parentID": "msg_user",
+        "role": "assistant",
+        "mode": "build",
+        "agent": "build",
+        "path": {
+          "cwd": "C:\\workspace\\demo-app",
+          "root": "C:\\workspace"
+        },
+        "cost": 0,
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "reasoning": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
+          }
+        },
+        "modelID": "grok-4.6",
+        "providerID": "xai",
+        "time": {
+          "created": 1790934075818
+        },
+        "sessionID": "ses_stream"
+      }
+    }
+  },
+  {
+    "id": "evt_0fbfd5919001ZUmmhHvz6AGTu7",
+    "type": "message.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "info": {
+        "role": "user",
+        "time": {
+          "created": 1790934075389
+        },
+        "agent": "build",
+        "model": {
+          "providerID": "xai",
+          "modelID": "grok-4.6"
+        },
+        "id": "msg_user",
+        "sessionID": "ses_stream",
+        "summary": {
+          "diffs": []
+        }
+      }
+    }
+  },
+  {
+    "id": "evt_0fbfd6aed001ALHGpMTIXCUOSX",
+    "type": "message.part.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "part": {
+        "id": "prt_sample_1",
+        "messageID": "msg_assistant",
+        "sessionID": "ses_stream",
+        "type": "text",
+        "text": "",
+        "time": {
+          "start": 1790934084332
+        }
+      },
+      "time": 1790934084332
+    }
+  },
+  {
+    "id": "evt_0fbfd6aef0013ZKVNtjolPvSiu",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "OPEN"
+    }
+  },
+  {
+    "id": "evt_0fbfd6aef002Q49dxvG14ul9Fm",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "CODE"
+    }
+  },
+  {
+    "id": "evt_0fbfd6af0001FyLLyuPEC7ToEK",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "_"
+    }
+  },
+  {
+    "id": "evt_0fbfd6af0002wVUPbo656ybaAC",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "WORK"
+    }
+  },
+  {
+    "id": "evt_0fbfd6af0003UKB5fIzHZrXBMf",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "SPACE"
+    }
+  },
+  {
+    "id": "evt_0fbfd6af1001WY2wF4UCumE9fh",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "_"
+    }
+  },
+  {
+    "id": "evt_0fbfd6af1002imz7HPnM65bmVa",
+    "type": "message.part.delta",
+    "properties": {
+      "sessionID": "ses_stream",
+      "messageID": "msg_assistant",
+      "partID": "prt_sample_1",
+      "field": "text",
+      "delta": "OK"
+    }
+  },
+  {
+    "id": "evt_0fbfd6af2001C2jmOI2s7ughoQ",
+    "type": "message.part.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "part": {
+        "id": "prt_sample_1",
+        "messageID": "msg_assistant",
+        "sessionID": "ses_stream",
+        "type": "text",
+        "text": "OPENCODE_WORKSPACE_OK",
+        "time": {
+          "start": 1790934084332,
+          "end": 1790934084338
+        }
+      },
+      "time": 1790934084338
+    }
+  },
+  {
+    "id": "evt_0fbfd6bb1001N4IYcMj4rVtEa6",
+    "type": "message.part.updated",
+    "properties": {
+      "sessionID": "ses_stream",
+      "part": {
+        "id": "prt_sample_2",
+        "reason": "stop",
+        "snapshot": "70f85b5b367e0f47da1891f6a4735d68cec1d337",
+        "messageID": "msg_assistant",
+        "sessionID": "ses_stream",
+        "type": "step-finish",
+        "tokens": {
+          "total": 13088,
+          "input": 12518,
+          "output": 7,
+          "reasoning": 51,
+          "cache": {
+            "write": 0,
+            "read": 512
+          }
+        },
+        "cost": 0.02564
+      },
+      "time": 1790934084529
+    }
+  }
+]

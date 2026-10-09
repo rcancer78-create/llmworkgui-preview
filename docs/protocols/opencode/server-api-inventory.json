@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "protocol": "opencode-serve-http",
+  "opencodeVersion": "1.18.31",
+  "capturedAt": "2026-09-22",
+  "evidence": "Sanitized inventory derived from a live probe of `opencode serve` 1.18.31 on loopback: OpenAPI 3.1 document at /doc plus the SSE stream at /event. Contains no credentials, tokens, API keys or user data.",
+  "baseUrl": "http://127.0.0.1:{dynamic-port}",
+  "defaultHostname": "127.0.0.1",
+  "defaultPort": 0,
+  "hostnameFlag": "--hostname",
+  "portFlag": "--port",
+  "openApiSpecPath": "/doc",
+  "authentication": {
+    "default": "none",
+    "note": "Loopback instances are unsecured by default. Optional HTTP basic auth is enabled by setting OPENCODE_SERVER_PASSWORD (username defaults to `opencode`, override with OPENCODE_SERVER_USERNAME). Values are never stored in fixtures or logs."
+  },
+  "eventStream": {
+    "globalPath": "/event",
+    "sessionPath": "/api/session/{sessionID}/event",
+    "contentType": "text/event-stream",
+    "envelope": {
+      "type": "string",
+      "properties": "object"
+    },
+    "firstEvent": "server.connected",
+    "acceptedEncoding": "Each SSE data payload is a JSON object with `type` and `properties`."
+  },
+  "runtimeSchemaSource": "/doc (OpenAPI 3.1) of the managed instance; request/response schemas are resolved at runtime during capability probe, not hard-coded from this snapshot.",
+  "endpoints": [
+    {
+      "id": "session.list",
+      "method": "GET",
+      "path": "/session",
+      "purpose": "List sessions known to the instance.",
+      "adapterOperation": "listSessions",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "session.create",
+      "method": "POST",
+      "path": "/session",
+      "purpose": "Create a native session bound to the instance workspace.",
+      "adapterOperation": "createSession",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "session.get",
+      "method": "GET",
+      "path": "/session/{sessionID}",
+      "purpose": "Read session details, including native ID, directory, model and permission evidence.",
+      "adapterOperation": "getSession",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "session.fork",
+      "method": "POST",
+      "path": "/session/{sessionID}/fork",
+      "purpose": "Fork an existing session and return the new native session.",
+      "adapterOperation": "forkSession",
+      "streaming": false,
+      "requiredForAdapter": true,
+      "notes": "Native fork support must be confirmed per instance before the UI exposes `Fork`; otherwise only `New session` with ancestry is allowed."
+    },
+    {
+      "id": "session.abort",
+      "method": "POST",
+      "path": "/session/{sessionID}/abort",
+      "purpose": "Request abort of the currently running turn.",
+      "adapterOperation": "abortTurn",
+      "streaming": false,
+      "requiredForAdapter": true,
+      "notes": "Only acknowledges the abort request; terminal confirmation arrives through the event stream."
+    },
+    {
+      "id": "session.diff",
+      "method": "GET",
+      "path": "/session/{sessionID}/diff",
+      "purpose": "Read the unified diff produced by the session.",
+      "adapterOperation": "getSessionDiff",
+      "streaming": false,
+      "requiredForAdapter": false
+    },
+    {
+      "id": "message.list",
+      "method": "GET",
+      "path": "/session/{sessionID}/message",
+      "purpose": "List messages and parts of a session for history and reconciliation.",
+      "adapterOperation": "listMessages",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "message.send",
+      "method": "POST",
+      "path": "/session/{sessionID}/message",
+      "purpose": "Send a user prompt and wait for the assistant response.",
+      "adapterOperation": "sendPrompt",
+      "streaming": false,
+      "requiredForAdapter": false,
+      "notes": "Synchronous variant; adapter uses the async variant for streaming turns."
+    },
+    {
+      "id": "message.sendAsync",
+      "method": "POST",
+      "path": "/session/{sessionID}/prompt_async",
+      "purpose": "Send a user prompt asynchronously; the response is observed through the event stream.",
+      "adapterOperation": "sendPromptAsync",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "event.streamGlobal",
+      "method": "GET",
+      "path": "/event",
+      "purpose": "Server-sent event stream for all sessions of the instance.",
+      "adapterOperation": "subscribeEvents",
+      "streaming": true,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "event.streamSession",
+      "method": "GET",
+      "path": "/api/session/{sessionID}/event",
+      "purpose": "Server-sent event stream scoped to one session.",
+      "adapterOperation": "subscribeSessionEvents",
+      "streaming": true,
+      "requiredForAdapter": false
+    },
+    {
+      "id": "permission.reply",
+      "method": "POST",
+      "path": "/permission/{requestID}/reply",
+      "purpose": "Reply to a pending permission (approval) request.",
+      "adapterOperation": "replyPermission",
+      "streaming": false,
+      "requiredForAdapter": true,
+      "notes": "Native response literals are version-specific and resolved by capability probe; unknown values must not be forwarded."
+    },
+    {
+      "id": "question.reply",
+      "method": "POST",
+      "path": "/question/{requestID}/reply",
+      "purpose": "Reply to a pending model question request.",
+      "adapterOperation": "replyQuestion",
+      "streaming": false,
+      "requiredForAdapter": false
+    },
+    {
+      "id": "health.api",
+      "method": "GET",
+      "path": "/api/health",
+      "purpose": "Instance liveness and health probe.",
+      "adapterOperation": "probeHealth",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "health.global",
+      "method": "GET",
+      "path": "/global/health",
+      "purpose": "Global server liveness and version probe.",
+      "adapterOperation": "probeGlobalHealth",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "config.providers",
+      "method": "GET",
+      "path": "/config/providers",
+      "purpose": "List configured providers and default models.",
+      "adapterOperation": "listConfiguredProviders",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "provider.list",
+      "method": "GET",
+      "path": "/api/provider",
+      "purpose": "List available providers and connected provider IDs.",
+      "adapterOperation": "listProviders",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "model.list",
+      "method": "GET",
+      "path": "/api/model",
+      "purpose": "List available models and variants for provider discovery.",
+      "adapterOperation": "listModels",
+      "streaming": false,
+      "requiredForAdapter": true
+    },
+    {
+      "id": "instance.dispose",
+      "method": "POST",
+      "path": "/instance/dispose",
+      "purpose": "Dispose the managed instance as part of supervised shutdown.",
+      "adapterOperation": "disposeInstance",
+      "streaming": false,
+      "requiredForAdapter": true
+    }
+  ],
+  "missingOperations": [
+    {
+      "id": "account.pin",
+      "description": "The generic server API exposes no operation to pin a provider account or to disable plugin auto-rotation for a GUI-managed session.",
+      "impact": "Multi-account routing cannot be enforced through generic endpoints; a plugin-specific bridge is required (TECHNICAL_SPECIFICATION.md §6.4).",
+      "fallback": "Plugin-specific bridge; plugins without pin support stay exposed as one opaque provider route."
+    },
+    {
+      "id": "account.observedRoute",
+      "description": "No generic endpoint returns the account/model/variant actually used for a turn.",
+      "impact": "RouteMismatch cannot be proven without plugin evidence; execution must not be counted as success.",
+      "fallback": "Plugin evidence or opaque execution; no automatic multi-account routing for plugins without evidence."
+    },
+    {
+      "id": "quota.snapshot",
+      "description": "No generic quota endpoint exists in the discovered inventory.",
+      "impact": "Quota rows for non-reporting sources must stay Unknown/Unsupported, never fabricated.",
+      "fallback": "Plugin-specific quota adapters; manual/local counters explicitly marked as local or estimated."
+    },
+    {
+      "id": "session.close",
+      "description": "No explicit session close/reset operation was part of the discovered inventory.",
+      "impact": "Reset must be implemented as a new native session with ancestry until a close/delete capability is confirmed.",
+      "fallback": "New session preserving history; Phase 3 must re-probe /doc for a delete/close operation."
+    },
+    {
+      "id": "cancellation.terminalAck",
+      "description": "session.abort only acknowledges the request; the terminal outcome is delivered through the event stream.",
+      "impact": "The Execution Watchdog must reconcile Cancelling to Cancelled or Ambiguous.",
+      "fallback": "Bounded forced termination of the managed execution with post-cancel session reconciliation."
+    },
+    {
+      "id": "server.restartState",
+      "description": "A server restart loses an in-flight turn; no in-flight prompt resume is defined.",
+      "impact": "Restart requires reconciliation outcomes Reattached, Orphaned, Ambiguous or BackendMissing (TECHNICAL_SPECIFICATION.md §6.7).",
+      "fallback": "Session reconciliation; no automatic prompt resend."
+    },
+    {
+      "id": "versionDrift",
+      "description": "Endpoint paths and event names are version-specific; public documentation tracks newer versions than 1.18.31.",
+      "impact": "This snapshot is evidence, not a permanent contract.",
+      "fallback": "Adapter probes /doc and capabilities at startup; mandatory operations missing produce UnsupportedVersion instead of a silent fallback."
+    }
+  ]
+}

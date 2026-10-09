@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "protocol": "cursor-agent-acp",
+  "agentVersion": "2026.09.15-d2fe57e",
+  "capturedAt": "2026-09-22",
+  "evidence": "Sanitized snapshot of Cursor Agent model discovery recorded during the Phase 0 handshake probe. Contains no credentials, tokens or private paths.",
+  "sanitization": {
+    "workspace": "C:\\workspace\\demo-app",
+    "account": "user@example.com",
+    "note": "Probe-local identifiers were replaced with fixed placeholders; model descriptors are recorded as discovered."
+  },
+  "selectionSyntax": {
+    "format": "<baseModelId>[<parameter>=<value>,...]",
+    "description": "Parameterized overrides are appended to the base model ID. The GUI stores the base model ID and the override set separately (ADR-0003).",
+    "examples": [
+      "cursor-grok-4.6-high[effort=high]",
+      "claude-4.6-sonnet[context=1m,effort=medium]",
+      "gpt-5.3-codex[effort=high]"
+    ]
+  },
+  "models": [
+    {
+      "modelId": "cursor-grok-4.6-high",
+      "family": "grok",
+      "displayName": "Grok 4.6 High",
+      "defaultContext": "256k",
+      "maxContext": "256k",
+      "overrides": [
+        {
+          "name": "effort",
+          "values": [
+            "low",
+            "medium",
+            "high",
+            "xhigh"
+          ],
+          "default": "high",
+          "state": "Supported"
+        }
+      ]
+    },
+    {
+      "modelId": "claude-4.6-sonnet",
+      "family": "claude",
+      "displayName": "Claude 4.6 Sonnet",
+      "defaultContext": "200k",
+      "maxContext": "1m",
+      "overrides": [
+        {
+          "name": "context",
+          "values": [
+            "200k",
+            "1m"
+          ],
+          "default": "200k",
+          "state": "Supported"
+        },
+        {
+          "name": "effort",
+          "values": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "medium",
+          "state": "Supported"
+        }
+      ]
+    },
+    {
+      "modelId": "gpt-5.3-codex",
+      "family": "gpt",
+      "displayName": "GPT-5.3 Codex",
+      "defaultContext": "272k",
+      "maxContext": "272k",
+      "overrides": [
+        {
+          "name": "context",
+          "values": [
+            "272k"
+          ],
+          "default": "272k",
+          "state": "Supported"
+        },
+        {
+          "name": "effort",
+          "values": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "medium",
+          "state": "Supported"
+        },
+        {
+          "name": "fast",
+          "values": [
+            "on",
+            "off"
+          ],
+          "default": "off",
+          "state": "Unknown"
+        }
+      ]
+    }
+  ],
+  "parameterStates": [
+    {
+      "parameter": "context",
+      "state": "Supported",
+      "note": "Sendable only with values confirmed by per-model discovery (for example 200k or 1m for claude-4.6-sonnet)."
+    },
+    {
+      "parameter": "effort",
+      "state": "Supported",
+      "note": "Sendable only with values confirmed by per-model discovery (for example low/medium/high/xhigh)."
+    },
+    {
+      "parameter": "fast",
+      "state": "Unknown",
+      "note": "Not confirmed by per-model discovery; the GUI must not offer or send this override."
+    }
+  ]
+}

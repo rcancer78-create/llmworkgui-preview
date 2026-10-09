@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LLMWorkGUI.Workflows</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LLMWorkGUI.Domain\LLMWorkGUI.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

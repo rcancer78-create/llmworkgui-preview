@@ -1,0 +1,350 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.DiffArtifactViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:LLMWorkGUI.App.Converters"
+             Background="{DynamicResource Theme.Background}"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True"
+             TextOptions.TextFormattingMode="Display">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LLMWorkGUI.App;component/Themes/Shared.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+            <Style x:Key="DiffBodyText" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Consolas" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                <Setter Property="TextWrapping" Value="NoWrap" />
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+            </Style>
+
+            <Style x:Key="DiffGutterText" TargetType="TextBlock" BasedOn="{StaticResource DiffBodyText}">
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Disabled}" />
+            </Style>
+
+            <Style x:Key="DiffMarkerText" TargetType="TextBlock" BasedOn="{StaticResource DiffBodyText}">
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Margin" Value="6,0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsAddition}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource Theme.Success}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDeletion}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource Theme.Error}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="DiffLineContainer" TargetType="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border Background="{TemplateBinding Background}" Padding="4,0">
+                                <ContentPresenter />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsAddition}" Value="True">
+                        <Setter Property="Background" Value="#336FD08C" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDeletion}" Value="True">
+                        <Setter Property="Background" Value="#33F08A8A" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsHunkHeader}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsFileHeader}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsMeta}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="SideBySideRowContainer" TargetType="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border Background="{TemplateBinding Background}" Padding="4,0">
+                                <ContentPresenter />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsAddition}" Value="True">
+                        <Setter Property="Background" Value="#336FD08C" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDeletion}" Value="True">
+                        <Setter Property="Background" Value="#33F08A8A" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsHunkHeader}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsFileHeader}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid x:Name="ViewerRoot" Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{DynamicResource PanelHeaderBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock x:Name="TitleText"
+                               Text="{Binding Title}"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               VerticalAlignment="Center" />
+                    <Border Style="{DynamicResource BadgeBorder}">
+                        <TextBlock Text="{Binding Mode}" Style="{DynamicResource BadgeText}" />
+                    </Border>
+                    <TextBlock Text="{Binding DiffSummaryDisplay}"
+                               Style="{DynamicResource SecondaryText}"
+                               FontSize="10"
+                               Margin="8,0,0,0"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding IsDiffMode, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="UnifiedLayoutButton"
+                            Content="Линейный"
+                            Command="{Binding UseUnifiedLayoutCommand}"
+                            Style="{DynamicResource CompactButton}"
+                            AutomationProperties.Name="Показать линейный объединённый diff" />
+                    <Button x:Name="SideBySideLayoutButton"
+                            Content="Бок о бок"
+                            Command="{Binding UseSideBySideLayoutCommand}"
+                            Style="{DynamicResource CompactButton}"
+                            Margin="4,0,0,0"
+                            AutomationProperties.Name="Показать diff бок о бок" />
+                    <Button x:Name="CopyDiffButton"
+                            Content="Копировать diff"
+                            Command="{Binding CopyDiffCommand}"
+                            Style="{DynamicResource CompactButton}"
+                            Margin="4,0,0,0"
+                            AutomationProperties.Name="Копировать diff в буфер обмена" />
+                    <Button x:Name="CopyContentButton"
+                            Content="Копировать содержимое"
+                            Command="{Binding CopyContentCommand}"
+                            Style="{DynamicResource CompactButton}"
+                            Margin="4,0,0,0"
+                            AutomationProperties.Name="Копировать содержимое артефакта в буфер обмена" />
+                    <Button x:Name="ClearButton"
+                            Content="Очистить"
+                            Command="{Binding ClearCommand}"
+                            Style="{DynamicResource CompactButton}"
+                            Margin="4,0,0,0"
+                            AutomationProperties.Name="Очистить просмотр" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid Visibility="{Binding IsDiffMode, Converter={StaticResource BoolToVisibility}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <ListBox x:Name="UnifiedLinesList"
+                         ItemsSource="{Binding UnifiedLines}"
+                         ItemContainerStyle="{StaticResource DiffLineContainer}"
+                         Background="{DynamicResource Theme.Surface}"
+                         BorderBrush="{DynamicResource Theme.Border}"
+                         BorderThickness="1"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         Visibility="{Binding IsUnifiedMode, Converter={StaticResource BoolToVisibility}}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding GutterDisplay}"
+                                           Style="{StaticResource DiffGutterText}" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Marker}"
+                                           Style="{StaticResource DiffMarkerText}" />
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding Text}"
+                                           Style="{StaticResource DiffBodyText}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox x:Name="SideBySideLinesList"
+                         ItemsSource="{Binding SideBySideRows}"
+                         ItemContainerStyle="{StaticResource SideBySideRowContainer}"
+                         Background="{DynamicResource Theme.Surface}"
+                         BorderBrush="{DynamicResource Theme.Border}"
+                         BorderThickness="1"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         Visibility="{Binding IsSideBySideMode, Converter={StaticResource BoolToVisibility}}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Border Background="{DynamicResource Theme.Selection.Background}"
+                                        Padding="4,0"
+                                        Visibility="{Binding IsFullWidth, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="{Binding FullWidthText}" Style="{StaticResource DiffBodyText}" />
+                                </Border>
+                                <Grid Visibility="{Binding IsFullWidth, Converter={StaticResource InverseBoolToVisibility}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="1" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding LeftLineNumberDisplay}"
+                                                   Style="{StaticResource DiffGutterText}"
+                                                   MinWidth="36" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding LeftMarker}"
+                                                   Style="{StaticResource DiffMarkerText}" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding LeftText}"
+                                                   Style="{StaticResource DiffBodyText}" />
+                                    </Grid>
+
+                                    <Border Grid.Column="1" Background="{DynamicResource Theme.Border}" />
+
+                                    <Grid Grid.Column="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding RightLineNumberDisplay}"
+                                                   Style="{StaticResource DiffGutterText}"
+                                                   MinWidth="36" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding RightMarker}"
+                                                   Style="{StaticResource DiffMarkerText}" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding RightText}"
+                                                   Style="{StaticResource DiffBodyText}" />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <Grid Visibility="{Binding IsArtifactMode, Converter={StaticResource BoolToVisibility}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="{DynamicResource Theme.Surface.Alt}"
+                        BorderBrush="{DynamicResource Theme.Border}"
+                        BorderThickness="1"
+                        CornerRadius="4,4,0,0"
+                        Padding="8,6">
+                    <WrapPanel>
+                        <TextBlock Text="Имя:" Style="{DynamicResource StatusLabel}" />
+                        <TextBlock x:Name="ArtifactNameText"
+                                   Text="{Binding ArtifactNameDisplay}"
+                                   Style="{DynamicResource StatusValue}"
+                                   Margin="0,0,12,0" />
+                        <TextBlock Text="Размер:" Style="{DynamicResource StatusLabel}" />
+                        <TextBlock x:Name="ArtifactSizeText"
+                                   Text="{Binding ArtifactSizeDisplay}"
+                                   Style="{DynamicResource StatusValue}"
+                                   Margin="0,0,12,0" />
+                        <TextBlock Text="Изменение:" Style="{DynamicResource StatusLabel}" />
+                        <TextBlock x:Name="ArtifactChangeText"
+                                   Text="{Binding ArtifactChangeStatusDisplay}"
+                                   Style="{DynamicResource StatusValue}"
+                                   Margin="0,0,12,0" />
+                        <TextBlock Text="SHA-256:" Style="{DynamicResource StatusLabel}" />
+                        <TextBlock x:Name="ArtifactHashText"
+                                   Text="{Binding ArtifactSha256Display}"
+                                   Style="{DynamicResource StatusValue}"
+                                   FontFamily="Consolas"
+                                   FontSize="10" />
+                    </WrapPanel>
+                </Border>
+
+                <TextBox x:Name="ArtifactContentBox"
+                         Grid.Row="1"
+                         Text="{Binding ArtifactContent, Mode=OneWay}"
+                         IsReadOnly="True"
+                         TextWrapping="NoWrap"
+                         AcceptsReturn="True"
+                         FontFamily="Consolas"
+                         FontSize="11"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Auto"
+                         Background="{DynamicResource Theme.Surface}"
+                         Foreground="{DynamicResource Theme.Text.Primary}"
+                         Visibility="{Binding HasArtifact, Converter={StaticResource BoolToVisibility}}"
+                         AutomationProperties.Name="Содержимое артефакта" />
+            </Grid>
+
+            <TextBlock x:Name="EmptyContentText"
+                       Text="{Binding ContentEmptyMessage}"
+                       Style="{DynamicResource EmptyStateText}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding HasContent, Converter={StaticResource InverseBoolToVisibility}}" />
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock x:Name="CopyNoticeText"
+                       Text="{Binding CopyNotice}"
+                       Style="{DynamicResource SecondaryText}"
+                       FontSize="10"
+                       Foreground="{DynamicResource Theme.Success}"
+                       Visibility="{Binding HasCopyNotice, Converter={StaticResource BoolToVisibility}}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

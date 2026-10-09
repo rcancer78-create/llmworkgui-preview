@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Visible-desktop acceptance harness for the Phase 10 pinned workflow run.
+
+    This project is a developer tool, not product runtime: nothing under src/ references it.
+    It belongs to LLMWorkGUI.sln and is compiled by solution builds as a net10.0-windows WPF tool.
+    The visible acceptance run is launched explicitly on Windows:
+
+        pwsh -File scripts/Run-VisibleWorkflowAcceptance.ps1
+
+    It composes the production host over a temporary application-data root, shows the shipped MainWindow
+    with the unified workspace shell, and drives the shipped product controls. It never launches the
+    unpackaged production App, never touches %LOCALAPPDATA%\LLMWorkGUI, and never records a reviewer
+    verdict or a model observation.
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>LLMWorkGUI.VisibleWorkflowHarness</RootNamespace>
+    <AssemblyName>LLMWorkGUI.VisibleWorkflowHarness</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LLMWorkGUI.App\LLMWorkGUI.App.csproj" />
+    <ProjectReference Include="..\..\src\LLMWorkGUI.Application\LLMWorkGUI.Application.csproj" />
+    <ProjectReference Include="..\..\src\LLMWorkGUI.Domain\LLMWorkGUI.Domain.csproj" />
+    <ProjectReference Include="..\..\src\LLMWorkGUI.Infrastructure\LLMWorkGUI.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

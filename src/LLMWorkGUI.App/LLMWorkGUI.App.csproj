@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>LLMWorkGUI.App</RootNamespace>
+    <AssemblyName>LLMWorkGUI.App</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LLMWorkGUI.Application\LLMWorkGUI.Application.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Domain\LLMWorkGUI.Domain.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Infrastructure\LLMWorkGUI.Infrastructure.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Backends.Abstractions\LLMWorkGUI.Backends.Abstractions.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Backends.OpenCode\LLMWorkGUI.Backends.OpenCode.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Backends.CursorAcp\LLMWorkGUI.Backends.CursorAcp.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Workflows\LLMWorkGUI.Workflows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\docs\USER_ADMIN_GUIDE.md" LogicalName="LLMWorkGUI.App.USER_ADMIN_GUIDE.md" />
+    <None Include="..\..\docs\USER_ADMIN_GUIDE.md" Link="USER_ADMIN_GUIDE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

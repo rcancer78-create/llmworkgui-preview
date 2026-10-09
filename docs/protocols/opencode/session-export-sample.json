@@ -1,0 +1,156 @@
+{
+  "info": {
+    "id": "ses_test01sanitized0000000000000001",
+    "slug": "sanitized-demo-session",
+    "projectID": "prj_test01sanitized00000000000001",
+    "directory": "C:\\workspace\\demo-app",
+    "parentID": null,
+    "summary": {
+      "additions": 0,
+      "deletions": 0,
+      "files": 1
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 1234,
+      "output": 567,
+      "reasoning": 123,
+      "cache": {
+        "read": 800,
+        "write": 200
+      }
+    },
+    "title": "Sanitized demo session",
+    "agent": "build",
+    "model": {
+      "id": "test-model",
+      "providerID": "test-provider",
+      "variant": null
+    },
+    "version": "1.18.31",
+    "time": {
+      "created": 1789948800000,
+      "updated": 1789948812000
+    },
+    "permission": {
+      "rules": []
+    }
+  },
+  "messages": [
+    {
+      "info": {
+        "id": "msg_test01user00000000000000000001",
+        "sessionID": "ses_test01sanitized0000000000000001",
+        "role": "user",
+        "time": {
+          "created": 1789948800000
+        },
+        "agent": "build",
+        "model": {
+          "providerID": "test-provider",
+          "modelID": "test-model"
+        }
+      },
+      "parts": [
+        {
+          "id": "prt_test01usertext0000000000000001",
+          "sessionID": "ses_test01sanitized0000000000000001",
+          "messageID": "msg_test01user00000000000000000001",
+          "type": "text",
+          "text": "List the files in the demo-app folder and read README.md.",
+          "time": {
+            "start": 1789948800000,
+            "end": 1789948800500
+          }
+        }
+      ]
+    },
+    {
+      "info": {
+        "id": "msg_test01assistant0000000000000001",
+        "sessionID": "ses_test01sanitized0000000000000001",
+        "role": "assistant",
+        "time": {
+          "created": 1789948801000,
+          "completed": 1789948812000
+        },
+        "agent": "build",
+        "model": {
+          "providerID": "test-provider",
+          "modelID": "test-model"
+        },
+        "cost": 0,
+        "tokens": {
+          "input": 1234,
+          "output": 567,
+          "reasoning": 123,
+          "cache": {
+            "read": 800,
+            "write": 200
+          }
+        },
+        "finish": "stop"
+      },
+      "parts": [
+        {
+          "id": "prt_test01step0start00000000000001",
+          "sessionID": "ses_test01sanitized0000000000000001",
+          "messageID": "msg_test01assistant0000000000000001",
+          "type": "step-start"
+        },
+        {
+          "id": "prt_test01toolread0000000000000001",
+          "sessionID": "ses_test01sanitized0000000000000001",
+          "messageID": "msg_test01assistant0000000000000001",
+          "type": "tool",
+          "callID": "call_test01read0000000000000001",
+          "tool": "read",
+          "state": {
+            "status": "completed",
+            "input": {
+              "filePath": "C:\\workspace\\demo-app\\README.md"
+            },
+            "output": "Sanitized README placeholder: local development reads credentials from environment variables and never stores secret values in the repository.",
+            "title": "Read README.md",
+            "metadata": {
+              "truncated": false,
+              "loaded": true
+            },
+            "time": {
+              "start": 1789948802000,
+              "end": 1789948806000
+            }
+          }
+        },
+        {
+          "id": "prt_test01text0000000000000000001",
+          "sessionID": "ses_test01sanitized0000000000000001",
+          "messageID": "msg_test01assistant0000000000000001",
+          "type": "text",
+          "text": "The demo-app folder contains README.md, build.ps1 and src/. The README documents local development steps and expects credentials to be provided through environment variables.",
+          "time": {
+            "start": 1789948806000,
+            "end": 1789948811000
+          }
+        },
+        {
+          "id": "prt_test01step0finish0000000000001",
+          "sessionID": "ses_test01sanitized0000000000000001",
+          "messageID": "msg_test01assistant0000000000000001",
+          "type": "step-finish",
+          "reason": "stop",
+          "tokens": {
+            "input": 1234,
+            "output": 567,
+            "reasoning": 123,
+            "cache": {
+              "read": 800,
+              "write": 200
+            }
+          },
+          "cost": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,327 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.WorkflowConsoleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LLMWorkGUI.App.ViewModels"
+             xmlns:views="clr-namespace:LLMWorkGUI.App.Views"
+             xmlns:converters="clr-namespace:LLMWorkGUI.App.Converters"
+             TextOptions.TextFormattingMode="Display">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <Style x:Key="ConsoleModeButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+            <Setter Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+        </Style>
+
+        <Style x:Key="ConsoleTemplatesButton" TargetType="Button" BasedOn="{StaticResource ConsoleModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsTemplatesMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ConsoleRolesButton" TargetType="Button" BasedOn="{StaticResource ConsoleModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRoleMatrixMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ConsoleDocumentsButton" TargetType="Button" BasedOn="{StaticResource ConsoleModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDocumentsMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ConsoleSchemaButton" TargetType="Button" BasedOn="{StaticResource ConsoleModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSchemaMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ConsoleActivityButton" TargetType="Button" BasedOn="{StaticResource ConsoleModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsActivityMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ConsoleInspectorButton" TargetType="Button" BasedOn="{StaticResource ConsoleModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInspectorMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="#80000000">
+        <!--
+            The console card is bounded by the space the overlay actually has, not by a fixed card size.
+            ConsoleOverlayRoot carries the outer margin, so the card may never grow past the overlay's
+            own client area in either direction: at the shipped 1280x800 window the run notice, the
+            refusal line and the footer stay on screen, and a resize or a high-DPI render only narrows
+            the content instead of clipping it.
+        -->
+        <Grid x:Name="ConsoleOverlayRoot" Margin="10">
+            <Border x:Name="ConsoleCardHost"
+                    Style="{DynamicResource PanelBorder}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    MaxWidth="{Binding ActualWidth, ElementName=ConsoleOverlayRoot}"
+                    MaxHeight="{Binding ActualHeight, ElementName=ConsoleOverlayRoot}"
+                    Padding="12">
+            <ScrollViewer x:Name="ConsoleViewport" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                          SizeChanged="OnConsoleViewportSizeChanged">
+            <Grid x:Name="ConsoleContent">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" MinHeight="360" MaxHeight="560" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding Title}" Style="{DynamicResource ScreenHeaderText}" />
+                        <TextBlock Text="{Binding Description}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding AvailabilityDisplay}"
+                                   Style="{DynamicResource WarningText}"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibility}}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,132,0" MaxWidth="420">
+                        <TextBlock Text="{Binding ActiveModeDisplay}"
+                                   Style="{DynamicResource StatusValue}"
+                                   HorizontalAlignment="Right" />
+                        <WrapPanel HorizontalAlignment="Right" Margin="0,2,0,0">
+                            <TextBlock Text="Версия:" Style="{DynamicResource StatusLabel}" />
+                            <TextBlock Text="{Binding SelectedWorkflowDisplay}"
+                                       Style="{DynamicResource StatusValue}"
+                                       Margin="0,0,10,0" />
+                            <TextBlock Text="Запуск:" Style="{DynamicResource StatusLabel}" />
+                            <TextBlock Text="{Binding RunSummaryDisplay}"
+                                       Style="{DynamicResource StatusValue}"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxWidth="360" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!--
+                    One compact switcher across the studio and monitor surfaces. It wraps instead of
+                    overflowing, so a narrower card or a high-DPI raster never cuts a mode control off.
+                -->
+                <WrapPanel Grid.Row="1" Margin="0,8,0,4">
+                    <TextBlock Text="Студия:"
+                               Style="{DynamicResource StatusLabel}"
+                               VerticalAlignment="Center" />
+                    <Button x:Name="ConsoleTemplatesButton"
+                            Content="Редактирование шаблонов"
+                            Style="{StaticResource ConsoleTemplatesButton}"
+                            Command="{Binding SelectModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowConsoleMode.StudioTemplates}"
+                            AutomationProperties.Name="Студия: редактирование шаблонов" />
+                    <Button x:Name="ConsoleRolesButton"
+                            Content="Матрица ролей"
+                            Style="{StaticResource ConsoleRolesButton}"
+                            Command="{Binding SelectModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowConsoleMode.StudioRoles}"
+                            AutomationProperties.Name="Студия: матрица ролей" />
+                    <Button x:Name="ConsoleDocumentsButton"
+                            Content="Предпросмотр документов"
+                            Style="{StaticResource ConsoleDocumentsButton}"
+                            Command="{Binding SelectModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowConsoleMode.StudioDocuments}"
+                            AutomationProperties.Name="Студия: предпросмотр документов" />
+                    <TextBlock Text="Монитор:"
+                               Style="{DynamicResource StatusLabel}"
+                               VerticalAlignment="Center"
+                               Margin="10,0,4,0" />
+                    <Button x:Name="ConsoleSchemaButton"
+                            Content="Схема графа"
+                            Style="{StaticResource ConsoleSchemaButton}"
+                            Command="{Binding SelectModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowConsoleMode.MonitorSchema}"
+                            AutomationProperties.Name="Монитор: схема графа" />
+                    <Button x:Name="ConsoleActivityButton"
+                            Content="Поток активности"
+                            Style="{StaticResource ConsoleActivityButton}"
+                            Command="{Binding SelectModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowConsoleMode.MonitorActivity}"
+                            AutomationProperties.Name="Монитор: поток активности" />
+                    <Button x:Name="ConsoleInspectorButton"
+                            Content="Инспектор"
+                            Style="{StaticResource ConsoleInspectorButton}"
+                            Command="{Binding SelectModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowConsoleMode.MonitorInspector}"
+                            AutomationProperties.Name="Монитор: инспектор" />
+                </WrapPanel>
+
+                <!-- One-click workflow package import/export. -->
+                <Border Grid.Row="2"
+                        Style="{DynamicResource PanelBorder}"
+                        Padding="8"
+                        Margin="0,0,0,6"
+                        Visibility="{Binding IsAvailable, Converter={StaticResource BoolToVisibility}}">
+                    <Grid MinWidth="680">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                            <TextBlock Text="Импорт ZIP (путь)" Style="{DynamicResource StatusLabel}" />
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right"
+                                        x:Name="ConsoleQuickImportButton"
+                                        Content="Импорт"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding Library.QuickImportCommand}"
+                                        AutomationProperties.Name="Быстрый импорт пакета сценария"
+                                        Margin="4,0,0,0" />
+                                <TextBox Text="{Binding Library.QuickImportPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AutomationProperties.Name="Путь ZIP-пакета для быстрого импорта" />
+                            </DockPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                            <TextBlock Text="Экспорт в каталог" Style="{DynamicResource StatusLabel}" />
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right"
+                                        x:Name="ConsoleQuickExportButton"
+                                        Content="Экспорт выбранной версии"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding Library.QuickExportCommand}"
+                                        AutomationProperties.Name="Быстрый экспорт выбранной версии сценария"
+                                        Margin="4,0,0,0" />
+                                <TextBox Text="{Binding Library.QuickExportDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AutomationProperties.Name="Каталог быстрого экспорта сценария" />
+                            </DockPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,6,0,0">
+                            <TextBlock Text="{Binding Library.QuickActionsNote}"
+                                       Style="{DynamicResource SecondaryText}"
+                                       FontSize="10" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Library.LastQuickExportPath}"
+                                       Style="{DynamicResource StatusValue}"
+                                       FontSize="10"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding Library.HasQuickExportPath, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!--
+                    Product run path (ROADMAP 10G). The buttons drive the composed run service: they start a
+                    real persisted run of the project's active binding and advance the observed run against
+                    the scheme it was pinned to. Enablement and the notice below come from the same view
+                    model, so a stale selection, an unbound project or a run with no next stage reports a
+                    named reason instead of pretending to be runnable.
+                -->
+                <Border Grid.Row="3"
+                        Style="{DynamicResource PanelBorder}"
+                        Padding="8"
+                        Margin="0,0,0,6"
+                        Visibility="{Binding IsAvailable, Converter={StaticResource BoolToVisibility}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <WrapPanel Grid.Column="0" VerticalAlignment="Top">
+                            <Button x:Name="ConsoleStartRunButton"
+                                    Content="Запустить запуск"
+                                    Style="{DynamicResource CompactButton}"
+                                    Command="{Binding Library.StartAssignedRunCommand}"
+                                    AutomationProperties.Name="Запустить запуск активной версии процесса"
+                                    ToolTip="{Binding Library.StartAssignedRunUnavailableReason}"
+                                    Margin="0,0,4,0" />
+                            <Button x:Name="ConsoleAdvanceRunButton"
+                                    Content="Переход по схеме"
+                                    Style="{DynamicResource CompactButton}"
+                                    Command="{Binding Library.AdvanceObservedRunCommand}"
+                                    AutomationProperties.Name="Перевести наблюдаемый запуск на следующую стадию" />
+                        </WrapPanel>
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <TextBlock Text="{Binding Library.RunCommandStateDisplay}"
+                                       Style="{DynamicResource StatusValue}"
+                                       FontSize="11"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding Library.RunCommandNotice}"
+                                       Style="{DynamicResource SecondaryText}"
+                                       FontSize="10"
+                                       TextWrapping="Wrap" />
+                            <TextBlock x:Name="ConsoleStartRunReasonText"
+                                       Text="{Binding Library.StartAssignedRunUnavailableReason}"
+                                       Style="{DynamicResource WarningText}"
+                                       FontSize="10"
+                                       TextWrapping="Wrap"
+                                       AutomationProperties.Name="Почему запуск run недоступен"
+                                       Visibility="{Binding Library.HasStartAssignedRunUnavailableReason, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="4" Height="560">
+                    <views:WorkflowStudioView x:Name="ConsolidatedStudioView"
+                                              DataContext="{Binding Studio}"
+                                              Visibility="{Binding DataContext.IsStudioVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}" />
+                    <views:WorkflowActivityMonitorView x:Name="ConsolidatedMonitorView"
+                                                       DataContext="{Binding Monitor}"
+                                                       Visibility="{Binding DataContext.IsMonitorVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}" />
+                </Grid>
+
+                <StackPanel x:Name="ConsoleFooter" Grid.Row="5" Margin="0,6,0,0">
+                    <TextBlock Text="{Binding Library.ObservedRunDisplay}"
+                               Style="{DynamicResource StatusValue}"
+                               FontSize="11"
+                               TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Library.ObservedRunNotice}"
+                               Style="{DynamicResource SecondaryText}"
+                               FontSize="10"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding Library.HasObservedRunNotice, Converter={StaticResource BoolToVisibility}}" />
+                    <TextBlock Text="{Binding Library.Blocker}"
+                               Style="{DynamicResource WarningText}"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding Library.HasBlocker, Converter={StaticResource BoolToVisibility}}" />
+                    <TextBlock Text="{Binding Library.StatusMessage}"
+                               Style="{DynamicResource SecondaryText}"
+                               FontSize="11"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding Library.HasStatusMessage, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+            </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+    </Border>
+</UserControl>

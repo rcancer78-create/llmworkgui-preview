@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "artifactId": "quota-capability-inventory",
+  "status": "Accepted",
+  "capturedAt": "2026-09-22",
+  "taskId": "TASK-004",
+  "evidence": "Normative quota capability inventory collected in Phase 0 from TECHNICAL_SPECIFICATION.md section 5 and section 6.6, ADR-0001, ADR-0002, ADR-0003 and the sanitized environment probe: OpenCode serve exposes no quota endpoint, Cursor ACP and AGY CLI expose no quota API, Codex quota was not confirmed. No credentials, tokens or private user paths are included.",
+  "sanitization": {
+    "workspace": "C:\\workspace\\demo-app",
+    "account": "user@example.com",
+    "note": "Probe-local identifiers were replaced with fixed placeholders; secret values are never recorded."
+  },
+  "normativeRules": {
+    "quotaValueStates": [
+      "ExactProviderReported",
+      "PluginReported",
+      "LocallyCalculated",
+      "Estimated",
+      "Stale",
+      "Unsupported",
+      "Unknown",
+      "Error"
+    ],
+    "quotaApiStates": [
+      "Supported",
+      "Unsupported",
+      "Unknown",
+      "Error"
+    ],
+    "numericValueStates": [
+      "ExactProviderReported",
+      "PluginReported",
+      "LocallyCalculated",
+      "Estimated"
+    ],
+    "nonNumericValueStates": [
+      "Stale",
+      "Unsupported",
+      "Unknown",
+      "Error"
+    ],
+    "trustedValueStates": [
+      "ExactProviderReported",
+      "PluginReported"
+    ],
+    "automaticScoringValueStates": [
+      "ExactProviderReported",
+      "PluginReported"
+    ],
+    "hardReserveValueStates": [
+      "ExactProviderReported",
+      "PluginReported"
+    ],
+    "localOrEstimatedParticipation": "LocallyCalculated and Estimated participate only after explicit user opt-in and never rank above a fresh trusted snapshot.",
+    "dashboardRowRequired": "Every connected account/model family has a dashboard row even when the provider exposes no quota API.",
+    "fabricatedValuesAllowed": false,
+    "forbiddenRepresentations": [
+      "numeric default when valueState is not numeric",
+      "full or empty gauge rendering for Unsupported, Unknown, Stale or Error",
+      "silent inference of numeric quota values from indirect signals",
+      "hard reserve comparison in a bucket that was never reported"
+    ],
+    "defaultTtlMinutes": 5,
+    "ttlConfiguration": "Per source; the provider-reported freshness wins over the default.",
+    "nonNumericNeverDisplayedAsBoundaryValue": true,
+    "bucketMissingIsNotZero": true,
+    "sharedSnapshotReference": "Dashboard and Routing Engine must reference the same quotaSnapshotId."
+  },
+  "providers": [
+    {
+      "providerId": "opencode-go",
+      "displayName": "OpenCode Go",
+      "backend": "opencode-serve",
+      "providerProfileIsolated": true,
+      "quotaApi": {
+        "state": "Unsupported",
+        "endpoint": null,
+        "evidence": "The discovered `opencode serve` 1.18.31 inventory contains no `/quota` endpoint; only `/stats` for local token spend of the current session is confirmed.",
+        "fallback": "local-session-counter"
+      },
+      "quotaFields": [
+        {
+          "fieldId": "opencode-go.session.tokens.local",
+          "bucket": "session",
+          "unit": "tokens",
+          "resetWindow": "none",
+          "resetWindowState": "Unknown",
+          "source": "local-session-stats",
+          "valueState": "LocallyCalculated",
+          "confidence": "low",
+          "numeric": true,
+          "explicitOptInRequired": true,
+          "notes": "Local token spend of the current session. It is not a provider quota and does not participate in automatic quota scoring without explicit user opt-in."
+        }
+      ]
+    },
+    {
+      "providerId": "plusvibeapi",
+      "displayName": "plusvibeapi (OpenCode-compatible provider)",
+      "backend": "opencode-serve",
+      "providerProfileIsolated": true,
+      "quotaApi": {
+        "state": "Unknown",
+        "endpoint": null,
+        "evidence": "Custom OpenCode-compatible provider configured with a baseUrl override; no quota API and no plugin bridge were confirmed in Phase 0.",
+        "fallback": "none"
+      },
+      "quotaFields": [
+        {
+          "fieldId": "plusvibeapi.account.quota",
+          "bucket": "account",
+          "unit": "not-reported",
+          "resetWindow": "not-reported",
+          "resetWindowState": "Unknown",
+          "source": "none",
+          "valueState": "Unknown",
+          "confidence": "none",
+          "numeric": false,
+          "explicitOptInRequired": false,
+          "notes": "Dashboard must still render the account/model family row with an honest Unknown state and no numeric value."
+        }
+      ]
+    },
+    {
+      "providerId": "cursor-agent",
+      "displayName": "Cursor Agent",
+      "backend": "cursor-acp",
+      "providerProfileIsolated": true,
+      "quotaApi": {
+        "state": "Unsupported",
+        "endpoint": null,
+        "evidence": "ADR-0003 section 8: Cursor Agent/ACP exposes no quota API; acp-capabilities.json reports quota.api=Unsupported.",
+        "fallback": "none"
+      },
+      "quotaFields": [
+        {
+          "fieldId": "cursor-agent.account.quota",
+          "bucket": "account",
+          "unit": "not-reported",
+          "resetWindow": "not-reported",
+          "resetWindowState": "Unknown",
+          "source": "none",
+          "valueState": "Unsupported",
+          "confidence": "none",
+          "numeric": false,
+          "explicitOptInRequired": false,
+          "notes": "Quota is never derived from indirect signals; the dashboard row stays Unsupported."
+        }
+      ]
+    },
+    {
+      "providerId": "codex-cli",
+      "displayName": "Codex via StarCliProxy (isolated CODEX_HOME profiles)",
+      "backend": "star-cli-proxy",
+      "providerProfileIsolated": true,
+      "quotaApi": {
+        "state": "Unknown",
+        "endpoint": null,
+        "evidence": "Phase 0 did not confirm a Codex quota API. Accepted topology uses StarCliProxy with isolated CODEX_HOME profiles; direct Codex and Codex-via-OpenCode are not productive routes. The codex-cli providerId is retained as an inventory identifier.",
+        "fallback": "none"
+      },
+      "quotaFields": [
+        {
+          "fieldId": "codex-cli.account.quota",
+          "bucket": "account",
+          "unit": "not-reported",
+          "resetWindow": "not-reported",
+          "resetWindowState": "Unknown",
+          "source": "none",
+          "valueState": "Unknown",
+          "confidence": "none",
+          "numeric": false,
+          "explicitOptInRequired": false,
+          "notes": "Unknown stays Unknown until verified evidence exists; fabricated values are forbidden."
+        }
+      ]
+    },
+    {
+      "providerId": "agy-cli",
+      "displayName": "AGY CLI",
+      "backend": "agy-cli",
+      "providerProfileIsolated": true,
+      "quotaApi": {
+        "state": "Unsupported",
+        "endpoint": null,
+        "evidence": "AGY CLI 1.1.23 provides no account quota query command.",
+        "fallback": "none"
+      },
+      "quotaFields": [
+        {
+          "fieldId": "agy-cli.account.quota",
+          "bucket": "account",
+          "unit": "not-reported",
+          "resetWindow": "not-reported",
+          "resetWindowState": "Unknown",
+          "source": "none",
+          "valueState": "Unsupported",
+          "confidence": "none",
+          "numeric": false,
+          "explicitOptInRequired": false,
+          "notes": "The product integrates AGY through star-cliproxy after selecting an agy-profile context; the CLI itself exposes no confirmed quota API."
+        }
+      ]
+    }
+  ]
+}

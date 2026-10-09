@@ -1,0 +1,454 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.Onboarding.OnboardingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:LLMWorkGUI.App.Converters"
+             TextOptions.TextFormattingMode="Display">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <Style x:Key="OnboardingStepButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+            <Setter Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="0,0,4,4" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="OnboardingCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="0,0,8,8" />
+        </Style>
+
+        <Style x:Key="OnboardingFieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Secondary}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,4,0,2" />
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="#80000000">
+        <Border x:Name="OnboardingCardHost"
+                Style="{DynamicResource PanelBorder}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                MaxWidth="980"
+                MaxHeight="680"
+                Margin="16"
+                Padding="14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding Title}" Style="{DynamicResource ScreenHeaderText}" />
+                        <TextBlock Text="{Binding Description}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding StepProgressDisplay}"
+                                   Style="{DynamicResource StatusValue}"
+                                   HorizontalAlignment="Right" />
+                        <Button x:Name="DismissOnboardingButton"
+                                Content="Скрыть"
+                                Style="{DynamicResource CompactButton}"
+                                Command="{Binding DismissCommand}"
+                                AutomationProperties.Name="Скрыть онбординг без блокировки интерфейса"
+                                Margin="0,4,0,0" />
+                    </StackPanel>
+                </Grid>
+
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding StepList}" Margin="0,8,0,4">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding SummaryDisplay}"
+                                    Style="{StaticResource OnboardingStepButton}"
+                                    Command="{Binding DataContext.SelectStepCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding Kind}"
+                                    AutomationProperties.Name="{Binding Title}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ScrollViewer x:Name="OnboardingStepScrollViewer" Grid.Row="2"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                <Grid MinHeight="{Binding ViewportHeight, ElementName=OnboardingStepScrollViewer}">
+                    <!-- Step 1: welcome and workspace confirmation. -->
+                    <Grid Visibility="{Binding IsWelcomeStep, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource OnboardingCard}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding CurrentStepTitle}"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock Text="{Binding CurrentStepDescription}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding NoPaidCallText}"
+                                           Style="{DynamicResource WarningText}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,8,0,0" />
+                                <TextBlock Text="{Binding CompletionDisplay}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           FontSize="10"
+                                           TextWrapping="Wrap"
+                                           Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource OnboardingCard}">
+                            <StackPanel>
+                                <TextBlock Text="Рабочий каталог проекта"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock Text="Локальный абсолютный путь"
+                                           Style="{StaticResource OnboardingFieldLabel}" />
+                                <TextBox x:Name="WorkspacePathBox"
+                                         Text="{Binding WorkspacePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AutomationProperties.Name="Путь рабочего каталога проекта" />
+                                <WrapPanel Margin="0,6,0,0">
+                                    <Button x:Name="ConfirmWorkspaceButton"
+                                            Content="Подтвердить каталог"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding ConfirmWorkspaceCommand}"
+                                            AutomationProperties.Name="Подтвердить рабочий каталог"
+                                            Margin="0,0,4,0" />
+                                    <Button x:Name="BrowseWorkspaceButton"
+                                            Content="Обзор…"
+                                            Style="{DynamicResource CompactButton}"
+                                            Click="OnBrowseWorkspaceClicked"
+                                            AutomationProperties.Name="Выбрать каталог в проводнике"
+                                            Margin="0,0,4,0" />
+                                    <Button x:Name="OpenProjectButton"
+                                            Content="Открыть как проект"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding OpenProjectCommand}"
+                                            AutomationProperties.Name="Открыть каталог как проект" />
+                                </WrapPanel>
+                                <TextBlock Text="{Binding WorkspaceConfirmationDisplay}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,6,0,0" />
+                                <TextBlock Text="{Binding WorkspaceStatus}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Step 2: local CLI and backend detection. -->
+                    <Grid Visibility="{Binding IsCliStep, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource OnboardingCard}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding CurrentStepTitle}"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock Text="{Binding CliHeadline}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding CliDetectionSummary}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding CliRecommendation}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           FontSize="10"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,0" />
+                                <Button x:Name="RefreshCliOnboardingButton"
+                                        Content="Повторить локальное обнаружение"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding RefreshCliCommand}"
+                                        AutomationProperties.Name="Повторить локальное обнаружение CLI"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource OnboardingCard}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Обнаруженные CLI и бэкенды"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock DockPanel.Dock="Bottom"
+                                           Text="Отсутствие CLI не блокирует онбординг: доступен деградированный режим. Неподтверждённые источники честно показываются как Not reported."
+                                           Style="{DynamicResource SecondaryText}"
+                                           FontSize="10"
+                                           TextWrapping="Wrap" />
+                                <ItemsControl ItemsSource="{Binding Backends}" Margin="0,4,0,4">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{DynamicResource TimelineCard}">
+                                                <StackPanel>
+                                                    <TextBlock Foreground="{DynamicResource Theme.Text.Primary}" Text="{Binding SummaryDisplay}"
+                                                               FontWeight="SemiBold"
+                                                               FontSize="11"
+                                                               TextWrapping="Wrap" />
+                                                    <TextBlock Text="{Binding DetailDisplay}"
+                                                               Style="{DynamicResource SecondaryText}"
+                                                               FontSize="10"
+                                                               TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Step 3: built-in workflow catalog and role matrix. -->
+                    <Grid Visibility="{Binding IsCatalogStep, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource OnboardingCard}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Готовые шаблоны сценариев"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="{Binding CatalogSummary}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap" />
+                                <Button DockPanel.Dock="Bottom"
+                                        x:Name="RefreshCatalogButton"
+                                        Content="Обновить каталог"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding RefreshCatalogCommand}"
+                                        AutomationProperties.Name="Обновить каталог шаблонов"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,6,0,0" />
+                                <ItemsControl ItemsSource="{Binding CatalogTemplates}" Margin="0,4,0,4">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{DynamicResource TimelineCard}">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding SummaryDisplay}"
+                                                               Style="{DynamicResource StatusValue}"
+                                                               TextWrapping="Wrap" />
+                                                    <TextBlock Text="{Binding RolesDisplay}"
+                                                               Style="{DynamicResource SecondaryText}"
+                                                               FontSize="10"
+                                                               TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource OnboardingCard}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Матрица ролей"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="{Binding RoleMatrixSummary}"
+                                           Style="{DynamicResource StatusValue}" />
+                                <ItemsControl DockPanel.Dock="Bottom"
+                                              ItemsSource="{Binding DocumentTemplateNames}"
+                                              Margin="0,6,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                       Style="{DynamicResource SecondaryText}"
+                                                       FontSize="10" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock DockPanel.Dock="Bottom"
+                                           Text="Шаблоны документов"
+                                           Style="{DynamicResource SectionHeaderText}" />
+                                <ItemsControl ItemsSource="{Binding RoleMatrix}" Margin="0,4,0,4">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding SummaryDisplay}"
+                                                       Style="{DynamicResource SecondaryText}"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,1" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Step 4: ready and local safe simulation. -->
+                    <Grid Visibility="{Binding IsReadyStep, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource OnboardingCard}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding CurrentStepTitle}"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock Text="{Binding WorkspaceConfirmationDisplay}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding CliDetectionSummary}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding CatalogSummary}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding RoleMatrixSummary}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           TextWrapping="Wrap" />
+                                <WrapPanel Margin="0,10,0,0">
+                                    <Button x:Name="OpenWorkspaceButton"
+                                            Content="Открыть рабочую область"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding OpenWorkspaceCommand}"
+                                            AutomationProperties.Name="Завершить онбординг и открыть рабочую область"
+                                            Margin="0,0,4,0" />
+                                    <Button x:Name="CompleteOnboardingButton"
+                                            Content="Завершить"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding CompleteCommand}"
+                                            AutomationProperties.Name="Завершить онбординг" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource OnboardingCard}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Безопасная симуляция"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0" />
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="{Binding SafeSimulationText}"
+                                           Style="{DynamicResource SecondaryText}"
+                                           FontSize="10"
+                                           TextWrapping="Wrap" />
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="{Binding SafeSimulationStatusDisplay}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,0" />
+                                <WrapPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+                                    <Button x:Name="StartSafeSimulationButton"
+                                            Content="Запустить synthetic-симуляцию"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding StartSafeSimulationCommand}"
+                                            AutomationProperties.Name="Запустить безопасную synthetic-симуляцию"
+                                            Margin="0,0,4,0" />
+                                    <Button x:Name="StopSafeSimulationButton"
+                                            Content="Остановить"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding StopSafeSimulationCommand}"
+                                            AutomationProperties.Name="Остановить безопасную симуляцию" />
+                                </WrapPanel>
+                                <ItemsControl ItemsSource="{Binding SimulationSteps}" Margin="0,4,0,4">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{DynamicResource TimelineCard}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0" Style="{DynamicResource SyntheticBadgeBorder}">
+                                                        <TextBlock Text="{Binding SyntheticLabel}"
+                                                                   Style="{DynamicResource SyntheticBadgeText}" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1" Text="{Binding SummaryDisplay}"
+                                                               Style="{DynamicResource StatusValue}"
+                                                               TextWrapping="Wrap"
+                                                               Margin="6,0,0,0" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+
+                </ScrollViewer>
+
+                <Grid Grid.Row="3" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding CurrentStepActionHint}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   FontSize="10"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Style="{DynamicResource StatusValue}"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding HasStatusMessage, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+
+                    <WrapPanel Grid.Column="1" HorizontalAlignment="Right">
+                        <Button x:Name="BackStepButton"
+                                Content="Назад"
+                                Style="{DynamicResource CompactButton}"
+                                Command="{Binding BackCommand}"
+                                AutomationProperties.Name="Предыдущий шаг онбординга"
+                                Margin="0,0,4,0" />
+                        <Button x:Name="NextStepButton"
+                                Content="{Binding NextButtonText}"
+                                Style="{DynamicResource CompactButton}"
+                                Command="{Binding NextCommand}"
+                                AutomationProperties.Name="Следующий шаг онбординга" />
+                    </WrapPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Border>
+</UserControl>

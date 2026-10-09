@@ -1,0 +1,155 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.CommandPaletteView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:LLMWorkGUI.App.Shell"
+             xmlns:converters="clr-namespace:LLMWorkGUI.App.Converters"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True"
+             TextOptions.TextFormattingMode="Display"
+             Focusable="False">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LLMWorkGUI.App;component/Themes/Shared.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+            <Style x:Key="CommandPaletteItemStyle" TargetType="ListBoxItem">
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="12,10" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="Bd"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Surface.Alt}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DataTemplate DataType="{x:Type shell:CommandPaletteItemViewModel}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <Border Style="{DynamicResource BadgeBorder}">
+                                <TextBlock Text="{Binding Category}" Style="{DynamicResource BadgeText}" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Description}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   FontSize="10"
+                                   TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding ShortcutDisplay}"
+                               Style="{DynamicResource SecondaryText}"
+                               FontSize="10"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0" />
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}" />
+        <KeyBinding Key="Up" Command="{Binding SelectPreviousCommand}" />
+        <KeyBinding Key="Down" Command="{Binding SelectNextCommand}" />
+        <KeyBinding Key="Enter" Command="{Binding ExecuteSelectedCommand}" />
+    </UserControl.InputBindings>
+
+    <Grid>
+        <Border x:Name="PaletteOverlay"
+                Background="#99000000"
+                Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border x:Name="PalettePanel"
+                    Width="620"
+                    MaxHeight="480"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0,72,0,0"
+                    Style="{DynamicResource PanelBorder}"
+                    KeyboardNavigation.TabNavigation="Cycle"
+                    KeyboardNavigation.ControlTabNavigation="Cycle">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Style="{DynamicResource PanelHeaderBorder}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Палитра команд" FontWeight="SemiBold" FontSize="12" />
+                            <TextBlock Text="Ctrl+K / Ctrl+P"
+                                       Style="{DynamicResource SecondaryText}"
+                                       FontSize="10"
+                                       Margin="8,0,0,0"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBox x:Name="SearchBox"
+                             DockPanel.Dock="Top"
+                             Margin="14,14,14,8"
+                             Padding="12,10"
+                             FontSize="15"
+                             AutomationProperties.Name="Поиск команд"
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Down" Command="{Binding SelectNextCommand}" />
+                            <KeyBinding Key="Up" Command="{Binding SelectPreviousCommand}" />
+                            <KeyBinding Key="Enter" Command="{Binding ExecuteSelectedCommand}" />
+                            <KeyBinding Key="Escape" Command="{Binding CloseCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+
+                    <TextBlock DockPanel.Dock="Bottom"
+                               Text="Enter — выполнить · ↑/↓ — навигация · Esc — закрыть"
+                               Style="{DynamicResource SecondaryText}"
+                               FontSize="10"
+                               Margin="20,10,20,14" />
+
+                    <Grid Margin="8,0,8,4">
+                        <ListBox x:Name="ResultsList"
+                                 ItemsSource="{Binding FilteredItems}"
+                                 SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                                 ItemContainerStyle="{StaticResource CommandPaletteItemStyle}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibility}}" />
+
+                        <TextBlock Text="{Binding ResultSummary}"
+                                   Style="{DynamicResource EmptyStateText}"
+                                   Visibility="{Binding HasResults, Converter={StaticResource InverseBoolToVisibility}}" />
+                    </Grid>
+                </DockPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

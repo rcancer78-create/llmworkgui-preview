@@ -1,0 +1,38 @@
+{
+  "version": "0.3.6",
+  "copiedOn": "2026-10-04",
+  "files": [
+    {
+      "source": "D:\\work\\grokbot\\bot.mjs",
+      "file": "bot.mjs",
+      "sha256": "35B460078E57E7F03B41100A75D3E66D070EF0EC619F8949D95383CA42652167"
+    },
+    {
+      "source": "D:\\work\\grokbot\\transport.mjs",
+      "file": "transport.mjs",
+      "sha256": "CD847E9A017E103E7443E631F7176AC7462AED52C1C58BA112C8385336A626EC",
+      "baselineSha256": "D6E52206956CC387A2860B99E24844AA4C5F56BEE301BCF7E7CA0601042EC463",
+      "upstreamSha256": "3B9D420B0C3F670A827CA1316A63839E4D69E06F403DA3BC46533C9C66F801B1",
+      "copiedWholeFile": false
+    },
+    {
+      "source": "D:\\work\\grokbot\\session.mjs",
+      "file": "session.mjs",
+      "sha256": "162DF5C2A2C9093BE9B27D6DCEFD78BDE26A30E415075BC8C02DF287C29AEA33",
+      "baselineSha256": "BF417966179A655EB08EBC845F2C1DB4005ACC53743F50B847B5225381B48CA2",
+      "upstreamSha256": "C744FCDE552CFD663369F9990DABCC11C77A843744FC34547DC039686E0867B2",
+      "copiedWholeFile": false,
+      "integration": "Selective synchronous DPAPI stdin from upstream dpapiSync; existing session capture retained."
+    },
+    {
+      "source": "D:\\work\\grokbot\\THIRD_PARTY_NOTICES.md",
+      "file": "THIRD_PARTY_NOTICES.md",
+      "sha256": "5B93CB1DF8A890CD4F65F77E81F3B63EC63600AD80899E9811B2961E4740E48C"
+    }
+  ],
+  "scope": "Temporal text request only; no project.mjs, server, credentials, logs or dependencies copied",
+  "integratedOn": "2026-10-06",
+  "upstreamReviewedVersion": "0.3.7",
+  "integration": "Selective: FrameBuffer and decodeFrames from 0.3.7; pinned endpoint, synchronous session capture and single RPC attempt retained.",
+  "localCorrections": "Refuse EOF without a Connect terminal frame; offline regression preserves valid fragmentation and trailer errors."
+}

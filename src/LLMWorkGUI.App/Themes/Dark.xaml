@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <sys:String x:Key="Theme.Palette.Name">Dark</sys:String>
+
+    <SolidColorBrush x:Key="Theme.Background" Color="#141617" />
+    <SolidColorBrush x:Key="Theme.Surface" Color="#1B1D1F" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#1B1D1F" />
+    <SolidColorBrush x:Key="Theme.Surface.Alt" Color="#242729" />
+    <SolidColorBrush x:Key="Theme.Surface.Card" Color="#202325" />
+    <SolidColorBrush x:Key="Theme.Border" Color="#3A3E40" />
+    <SolidColorBrush x:Key="Theme.Border.Subtle" Color="#2C3032" />
+
+    <SolidColorBrush x:Key="Theme.Text.Primary" Color="#EEF0F1" />
+    <SolidColorBrush x:Key="Theme.Text.Secondary" Color="#A3AAAE" />
+    <SolidColorBrush x:Key="Theme.Text.Disabled" Color="#777F84" />
+
+    <SolidColorBrush x:Key="Theme.Accent" Color="#A4DDC8" />
+    <SolidColorBrush x:Key="Theme.Accent.Text" Color="#132B23" />
+    <SolidColorBrush x:Key="Theme.Selection.Background" Color="#283B34" />
+
+    <SolidColorBrush x:Key="Theme.Warning" Color="#F0B85C" />
+    <SolidColorBrush x:Key="Theme.Warning.Surface" Color="#3A3018" />
+    <SolidColorBrush x:Key="Theme.Success" Color="#6FD08C" />
+    <SolidColorBrush x:Key="Theme.Error" Color="#F08A8A" />
+
+    <SolidColorBrush x:Key="Theme.Badge.Neutral.Background" Color="#2D3134" />
+    <SolidColorBrush x:Key="Theme.Badge.Neutral.Text" Color="#BEC5C9" />
+    <SolidColorBrush x:Key="Theme.Badge.Synthetic.Background" Color="#3A2F55" />
+    <SolidColorBrush x:Key="Theme.Badge.Synthetic.Text" Color="#CDB6FA" />
+
+    <SolidColorBrush x:Key="Theme.Nav.Background" Color="#141617" />
+    <SolidColorBrush x:Key="Theme.Status.Background" Color="#141617" />
+
+    <SolidColorBrush x:Key="Theme.Status.Working.Background" Color="#1C3252" />
+    <SolidColorBrush x:Key="Theme.Status.Working.Border" Color="#2E4F7E" />
+    <SolidColorBrush x:Key="Theme.Status.Working.Text" Color="#70B0FF" />
+    <SolidColorBrush x:Key="Theme.Status.Hung.Background" Color="#422C10" />
+    <SolidColorBrush x:Key="Theme.Status.Hung.Border" Color="#664618" />
+    <SolidColorBrush x:Key="Theme.Status.Hung.Text" Color="#FFC56E" />
+    <SolidColorBrush x:Key="Theme.Status.Done.Background" Color="#133820" />
+    <SolidColorBrush x:Key="Theme.Status.Done.Border" Color="#1E5230" />
+    <SolidColorBrush x:Key="Theme.Status.Done.Text" Color="#7CE09A" />
+    <SolidColorBrush x:Key="Theme.Status.Stopped.Background" Color="#3B2020" />
+    <SolidColorBrush x:Key="Theme.Status.Stopped.Border" Color="#5A3030" />
+    <SolidColorBrush x:Key="Theme.Status.Stopped.Text" Color="#FFA0A0" />
+    <SolidColorBrush x:Key="Theme.Status.Idle.Background" Color="#1C2635" />
+    <SolidColorBrush x:Key="Theme.Status.Idle.Border" Color="#404650" />
+    <SolidColorBrush x:Key="Theme.Status.Idle.Text" Color="#9AA2AD" />
+
+</ResourceDictionary>

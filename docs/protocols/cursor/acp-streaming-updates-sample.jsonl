@@ -1,0 +1,4 @@
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"sess-test-42","update":{"type":"text","text":"I am inspecting the workspace."}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"sess-test-42","update":{"type":"thought","text":"Checking directory contents first."}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"sess-test-42","update":{"type":"tool_call","callId":"call-101","name":"readFile","arguments":{"path":"README.md"}}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"sess-test-42","update":{"type":"status","phase":"generating"}}}

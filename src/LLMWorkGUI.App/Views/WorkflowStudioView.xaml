@@ -1,0 +1,823 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.WorkflowStudioView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:LLMWorkGUI.App.ViewModels"
+             xmlns:converters="clr-namespace:LLMWorkGUI.App.Converters"
+             Background="{DynamicResource Theme.Background}"
+             TextOptions.TextFormattingMode="Display">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <Style x:Key="StudioCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Theme.Surface}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="Margin" Value="0,0,8,8" />
+        </Style>
+
+        <Style x:Key="StudioFieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Secondary}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Margin" Value="0,4,0,0" />
+        </Style>
+
+        <!-- Compact consolidated navigation (ROADMAP Phase 11): overview, templates, roles, documents. -->
+        <Style x:Key="StudioModeButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Secondary}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,3" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Surface}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="StudioOverviewButton" TargetType="Button" BasedOn="{StaticResource StudioModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsOverviewMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                    <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StudioTemplatesButton" TargetType="Button" BasedOn="{StaticResource StudioModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsTemplatesMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                    <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StudioRolesButton" TargetType="Button" BasedOn="{StaticResource StudioModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRoleMatrixMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                    <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StudioDocumentsButton" TargetType="Button" BasedOn="{StaticResource StudioModeButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDocumentsMode}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Theme.Selection.Background}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Accent}" />
+                    <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StudioPrimarySurface" TargetType="Grid">
+            <Setter Property="Grid.Row" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsTemplatesMode}" Value="True">
+                    <Setter Property="Grid.RowSpan" Value="2" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StudioSecondarySurface" TargetType="Grid">
+            <Setter Property="Grid.Row" Value="1" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDocumentsMode}" Value="True">
+                    <Setter Property="Grid.Row" Value="0" />
+                    <Setter Property="Grid.RowSpan" Value="2" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="{Binding TitleText}" Style="{DynamicResource ScreenHeaderText}" />
+            <TextBlock Text="{Binding DescriptionText}"
+                       Style="{DynamicResource SecondaryText}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,6,0,6">
+            <TextBlock Text="{Binding StudioNote}"
+                       Style="{DynamicResource SecondaryText}"
+                       FontSize="10"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="{Binding GateNote}"
+                       Style="{DynamicResource SecondaryText}"
+                       FontSize="10"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="{Binding ReviewerNote}"
+                       Style="{DynamicResource SecondaryText}"
+                       FontSize="10"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="{Binding UnavailableNotice}"
+                       Style="{DynamicResource WarningText}"
+                       FontSize="10"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding IsStudioAvailable, Converter={StaticResource InverseBoolToVisibility}}" />
+        </StackPanel>
+
+        <DockPanel Grid.Row="2" Margin="0,2,0,6" LastChildFill="False">
+            <TextBlock DockPanel.Dock="Left"
+                       Text="{Binding ActivePanelModeDisplay}"
+                       Style="{DynamicResource StatusValue}"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0" />
+            <Border Style="{DynamicResource SegmentedContainer}">
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="StudioOverviewModeButton"
+                            Content="Обзор"
+                            Style="{StaticResource StudioOverviewButton}"
+                            Command="{Binding SelectPanelModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowStudioPanelMode.Overview}"
+                            AutomationProperties.Name="Показать обзор студии" />
+                    <Button x:Name="StudioTemplatesModeButton"
+                            Content="Редактирование шаблонов"
+                            Style="{StaticResource StudioTemplatesButton}"
+                            Command="{Binding SelectPanelModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowStudioPanelMode.Templates}"
+                            AutomationProperties.Name="Показать редактирование шаблонов" />
+                    <Button x:Name="StudioRoleMatrixModeButton"
+                            Content="Матрица ролей"
+                            Style="{StaticResource StudioRolesButton}"
+                            Command="{Binding SelectPanelModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowStudioPanelMode.RoleMatrix}"
+                            AutomationProperties.Name="Показать матрицу ролей" />
+                    <Button x:Name="StudioDocumentsModeButton"
+                            Content="Предпросмотр документов"
+                            Style="{StaticResource StudioDocumentsButton}"
+                            Command="{Binding SelectPanelModeCommand}"
+                            CommandParameter="{x:Static vm:WorkflowStudioPanelMode.Documents}"
+                            AutomationProperties.Name="Показать предпросмотр документов" />
+                </StackPanel>
+            </Border>
+        </DockPanel>
+
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="260" />
+                <RowDefinition Height="*" MinHeight="260" />
+            </Grid.RowDefinitions>
+
+            <!-- Two separate surfaces: the editable template schema on the left, the actual run graph on
+                 the right. The run graph is read-only and is never rebuilt from the edited schema. -->
+            <Grid Style="{StaticResource StudioPrimarySurface}"
+                  Visibility="{Binding IsPrimarySurfaceVisible, Converter={StaticResource BoolToVisibility}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="420" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" MinWidth="320" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource StudioCard}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Style="{DynamicResource PanelHeaderBorder}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding TemplateSchemaHeaderText}"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0"
+                                           VerticalAlignment="Center" />
+                                <Border Grid.Column="1" Style="{DynamicResource BadgeBorder}" Margin="0">
+                                    <TextBlock Text="СОЗДАНИЕ СХЕМЫ" Style="{DynamicResource BadgeText}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Grid DockPanel.Dock="Bottom" Margin="0,6,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    Content="Клонировать"
+                                    Style="{DynamicResource CompactButton}"
+                                    Margin="0,0,3,0"
+                                    Command="{Binding CloneTemplateCommand}" />
+                            <Button Grid.Column="1"
+                                    Content="Создать версию"
+                                    Style="{DynamicResource CompactButton}"
+                                    Margin="0,0,3,0"
+                                    Command="{Binding CreateTemplateVersionCommand}" />
+                            <Button Grid.Column="2"
+                                    Content="Проверить граф"
+                                    Style="{DynamicResource CompactButton}"
+                                    Margin="0,0,3,0"
+                                    Command="{Binding ValidateTemplateCommand}" />
+                            <Button Grid.Column="3"
+                                    Content="Сохранить версию"
+                                    Style="{DynamicResource CompactButton}"
+                                    FontWeight="SemiBold"
+                                    Command="{Binding SaveTemplateCommand}" />
+                        </Grid>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,4,4,0">
+                            <StackPanel>
+                                <ListBox ItemsSource="{Binding Templates}"
+                                         SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                         DisplayMemberPath="SummaryDisplay"
+                                         MaxHeight="90" />
+
+                                <TextBlock Text="Шаблон:" Style="{DynamicResource StudioFieldLabel}" />
+                                <TextBlock Text="{Binding SelectedTemplateDisplay}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap" />
+
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="60" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Новый id" Style="{DynamicResource StatusLabel}" />
+                                        <TextBox Text="{Binding NewTemplateId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Новое имя" Style="{DynamicResource StatusLabel}" />
+                                        <TextBox Text="{Binding NewTemplateName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Версия" Style="{DynamicResource StatusLabel}" />
+                                        <TextBox Text="{Binding NewTemplateVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="{Binding TemplateGraphSummary}"
+                                           Style="{DynamicResource StatusValue}"
+                                           Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding TemplateValidationMessage}"
+                                           Style="{DynamicResource WarningText}"
+                                           TextWrapping="Wrap"
+                                           Visibility="{Binding HasTemplateValidation, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Text="{Binding TemplateValidationStatusDisplay}"
+                                           Style="{DynamicResource StatusValue}"
+                                           Visibility="{Binding HasTemplateValidation, Converter={StaticResource BoolToVisibility}}" />
+
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ListBox Grid.Column="0"
+                                             ItemsSource="{Binding TemplateNodes}"
+                                             SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                                             DisplayMemberPath="NodeId"
+                                             MaxHeight="80" />
+                                    <Button Grid.Column="1"
+                                            Content="Добавить узел"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding AddNodeCommand}"
+                                            VerticalAlignment="Top" />
+                                    <Button Grid.Column="2"
+                                            Content="Удалить узел"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding RemoveNodeCommand}"
+                                            VerticalAlignment="Top" />
+                                </Grid>
+
+                                <Border Margin="0,4,0,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedNode}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid DataContext="{Binding SelectedNode}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0" Grid.Column="0">
+                                            <TextBlock Text="Node.id" Style="{DynamicResource StatusLabel}" />
+                                            <TextBox Text="{Binding NodeId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="1">
+                                            <TextBlock Text="Роль" Style="{DynamicResource StatusLabel}" />
+                                            <TextBox Text="{Binding RoleBinding, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="0">
+                                            <TextBlock Text="Целевой узел успеха" Style="{DynamicResource StatusLabel}" />
+                                            <TextBox Text="{Binding SuccessTargetNodeId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="1">
+                                            <TextBlock Text="Целевой узел ошибки" Style="{DynamicResource StatusLabel}" />
+                                            <TextBox Text="{Binding FailureTargetNodeId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Grid.Column="0">
+                                            <TextBlock Text="Маршрут" Style="{DynamicResource StatusLabel}" />
+                                            <TextBox Text="{Binding PrimaryRouteId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+
+                <GridSplitter Grid.Column="1"
+                              Width="4"
+                              HorizontalAlignment="Stretch"
+                              Style="{DynamicResource PanelSplitter}" />
+
+                <Border Grid.Column="2" Style="{StaticResource StudioCard}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Style="{DynamicResource PanelHeaderBorder}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding RunGraphHeaderText}"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0"
+                                           VerticalAlignment="Center" />
+                                <Border Grid.Column="1"
+                                        Background="{DynamicResource Theme.Status.Working.Background}"
+                                        CornerRadius="3"
+                                        Padding="5,1"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="НАБЛЮДАЕМЫЙ (ТОЛЬКО ЧТЕНИЕ)"
+                                               FontSize="9.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Theme.Status.Working.Text}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="{Binding RunGraphSummary}"
+                                   Style="{DynamicResource StatusValue}"
+                                   Margin="0,4,0,6"
+                                   TextWrapping="Wrap" />
+
+                        <ItemsControl ItemsSource="{Binding RunNodes}"
+                                      Visibility="{Binding HasRunGraph, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{DynamicResource TimelineCard}" Margin="0,2,0,3" Padding="8,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Ellipse Grid.Column="0"
+                                                     Width="8" Height="8"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,8,0">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="{DynamicResource Theme.Success}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                                <Setter Property="Fill" Value="{DynamicResource Theme.Accent}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding SummaryDisplay}"
+                                                       Style="{DynamicResource StatusValue}"
+                                                       VerticalAlignment="Center"
+                                                       TextWrapping="Wrap" />
+                                            <Border Grid.Column="2"
+                                                    Style="{DynamicResource WorkingPill}"
+                                                    Margin="6,0,0,0"
+                                                    Visibility="{Binding IsCurrent, Converter={StaticResource BoolToVisibility}}">
+                                                <TextBlock Text="current" Style="{DynamicResource WorkingPillText}" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- Versioned document drafts, separate reviewer verdicts and the pre-coder gate. -->
+            <Grid Style="{StaticResource StudioSecondarySurface}"
+                  Visibility="{Binding IsSecondarySurfaceVisible, Converter={StaticResource BoolToVisibility}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="420" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" MinWidth="320" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource StudioCard}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Style="{DynamicResource PanelHeaderBorder}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="Документы: draft, версия, hash, вердикты"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0"
+                                           VerticalAlignment="Center" />
+                                <Border Grid.Column="1" Style="{DynamicResource BadgeBorder}" Margin="0">
+                                    <TextBlock Text="ЧЕРНОВИКИ ДОКУМЕНТОВ" Style="{DynamicResource BadgeText}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Grid DockPanel.Dock="Top" Margin="0,4,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0"
+                                      ItemsSource="{Binding DocumentTemplates}"
+                                      SelectedItem="{Binding SelectedDocumentTemplate, Mode=TwoWay}"
+                                      DisplayMemberPath="DisplayName"
+                                      Margin="0,0,6,0" />
+                            <Button Grid.Column="1"
+                                    Content="Сгенерировать черновик"
+                                    Style="{DynamicResource CompactButton}"
+                                    Command="{Binding GenerateDraftCommand}" />
+                        </Grid>
+
+                        <StackPanel DockPanel.Dock="Top">
+                            <TextBlock Text="{Binding SelectedDocumentInstructions}"
+                                       Style="{DynamicResource SecondaryText}"
+                                       FontSize="10"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,4" />
+                            <Grid Margin="0,2,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding DraftTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0,0,4,0" />
+                                <Button Grid.Column="1"
+                                        Content="Сохранить правку"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding UpdateDraftCommand}"
+                                        Margin="0,0,4,0" />
+                                <Button Grid.Column="2"
+                                        Content="Проверка секретов / предпросмотр"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding PreviewDraftCommand}" />
+                            </Grid>
+                            <Border Background="{DynamicResource Theme.Surface.Card}"
+                                    BorderBrush="{DynamicResource Theme.Border.Subtle}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="8,4"
+                                    Margin="0,2,0,6">
+                                <WrapPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Hash:" Style="{DynamicResource StatusLabel}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                    <TextBlock Text="{Binding DraftHashDisplay}"
+                                               Style="{DynamicResource StatusValue}"
+                                               FontFamily="Consolas, Cascadia Code, monospace"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0" />
+                                    <TextBlock Text="Версия:" Style="{DynamicResource StatusLabel}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                    <Border Style="{DynamicResource DonePill}" VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <TextBlock Text="{Binding DraftVersionDisplay}" Style="{DynamicResource DonePillText}" />
+                                    </Border>
+                                    <TextBlock Text="{Binding CompletenessDisplay}"
+                                               Style="{DynamicResource SecondaryText}"
+                                               VerticalAlignment="Center" />
+                                </WrapPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,2,4,0">
+                            <StackPanel>
+                                <TextBox Text="{Binding DraftContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         MinHeight="60"
+                                         MaxHeight="110"
+                                         VerticalScrollBarVisibility="Auto" />
+
+                                <TextBlock Text="Предпросмотр (с сокращением) / проверка секретов"
+                                           Style="{DynamicResource StudioFieldLabel}"
+                                           Margin="0,6,0,2" />
+                                <TextBlock Text="{Binding PreviewScanSummary}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding PreviewSummary}"
+                                           Style="{DynamicResource WarningText}"
+                                           TextWrapping="Wrap" />
+                                <TextBox Text="{Binding PreviewContent, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         MinHeight="40"
+                                         MaxHeight="90"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibility}}" />
+
+                                <TextBlock Text="Вердикты ревьюеров (раздельно)"
+                                           Style="{DynamicResource StudioFieldLabel}"
+                                           Margin="0,8,0,4" />
+                                <ItemsControl ItemsSource="{Binding ReviewerVerdicts}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{DynamicResource TimelineCard}" Margin="0,1,0,3" Padding="8,4">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0"
+                                                            Width="6" Height="6"
+                                                            CornerRadius="3"
+                                                            Background="{DynamicResource Theme.Success}"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,8,0" />
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding SummaryDisplay}"
+                                                               Style="{DynamicResource StatusValue}"
+                                                               TextWrapping="Wrap" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Grid Margin="0,4,0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0"
+                                              ItemsSource="{Binding ReviewerVerdictOptions}"
+                                              SelectedItem="{Binding ReviewerVerdict, Mode=TwoWay}"
+                                              Margin="0,0,4,0" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding ReviewerRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,0,4,0" />
+                                    <Button Grid.Column="2"
+                                            Content="Добавить вердикт"
+                                            Style="{DynamicResource CompactButton}"
+                                            Command="{Binding AddReviewVerdictCommand}" />
+                                </Grid>
+                                <Grid Margin="0,2,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding ReviewerRouteId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,0,2,0" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding ReviewerEvidence, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="2,0,0,0" />
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+
+                <GridSplitter Grid.Column="1"
+                              Width="4"
+                              HorizontalAlignment="Stretch"
+                              Style="{DynamicResource PanelSplitter}" />
+
+                <Border Grid.Column="2" Style="{StaticResource StudioCard}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Style="{DynamicResource PanelHeaderBorder}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="Шлюз перед кодером"
+                                           Style="{DynamicResource SectionHeaderText}"
+                                           Margin="0"
+                                           VerticalAlignment="Center" />
+                                <Border Grid.Column="1" Style="{DynamicResource BadgeBorder}" Margin="0">
+                                    <TextBlock Text="ШЛЮЗ БЕЗОПАСНОСТИ" Style="{DynamicResource BadgeText}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="{Binding GateNote}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   FontSize="10"
+                                   TextWrapping="Wrap"
+                                   Margin="0,2,0,4" />
+
+                        <StackPanel DockPanel.Dock="Top">
+                            <Grid Margin="0,2,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Запрошенный маршрут" Style="{DynamicResource StatusLabel}" />
+                                    <TextBox Text="{Binding GateRequestedRouteId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="Наблюдаемый маршрут" Style="{DynamicResource StatusLabel}" />
+                                    <TextBox Text="{Binding GateObservedRouteId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </Grid>
+                            <WrapPanel Margin="0,2,0,4">
+                                <CheckBox Content="Требуется UI-артефакт"
+                                          IsChecked="{Binding GateRequiresUiArtifact, Mode=TwoWay}"
+                                          Margin="0,0,10,0" />
+                                <CheckBox Content="UI-артефакт есть"
+                                          IsChecked="{Binding UiArtifactPresent, Mode=TwoWay}"
+                                          Margin="0,0,10,0" />
+                                <CheckBox Content="Требуется визуальная приёмка"
+                                          IsChecked="{Binding GateRequiresUserVisualAcceptance, Mode=TwoWay}"
+                                          Margin="0,0,10,0" />
+                                <CheckBox Content="Визуальная приёмка есть"
+                                          IsChecked="{Binding VisualAcceptancePresent, Mode=TwoWay}" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2,0,4">
+                                <Button Content="Проверить готовность"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding RefreshGateCommand}"
+                                        Margin="0,0,4,0" />
+                                <Button Content="Утвердить документ"
+                                        Style="{DynamicResource CompactButton}"
+                                        Command="{Binding ApproveDocumentCommand}"
+                                        Margin="0,0,4,0" />
+                                <Button Content="Запросить старт кодера"
+                                        Style="{DynamicResource CompactButton}"
+                                        FontWeight="SemiBold"
+                                        Command="{Binding RequestCoderStartCommand}" />
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,2,4,0">
+                            <StackPanel>
+                                <TextBlock Text="{Binding GateBlockedTransitionDisplay}"
+                                           Style="{DynamicResource StatusLabel}" />
+                                <TextBlock Text="{Binding GateSummary}"
+                                           Style="{DynamicResource StatusValue}"
+                                           TextWrapping="Wrap" />
+                                <Border Margin="0,4,0,4"
+                                        Padding="8,5"
+                                        CornerRadius="4"
+                                        Background="{DynamicResource Theme.Status.Working.Background}"
+                                        BorderBrush="{DynamicResource Theme.Status.Working.Border}"
+                                        BorderThickness="1">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Left"
+                                                   Text="⚡"
+                                                   Foreground="{DynamicResource Theme.Status.Working.Text}"
+                                                   FontWeight="Bold"
+                                                   Margin="0,0,6,0"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding CoderStartStatusDisplay}"
+                                                   Foreground="{DynamicResource Theme.Status.Working.Text}"
+                                                   FontWeight="SemiBold"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Center" />
+                                    </DockPanel>
+                                </Border>
+                                <TextBlock Text="{Binding GateEscalationDisplay}"
+                                           Style="{DynamicResource WarningText}"
+                                           TextWrapping="Wrap"
+                                           Visibility="{Binding GateRequiresEscalation, Converter={StaticResource BoolToVisibility}}" />
+
+                                <ItemsControl ItemsSource="{Binding GateChecks}" Margin="0,4,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{DynamicResource TimelineCard}" Margin="0,1,0,3" Padding="8,4">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0"
+                                                            Width="6" Height="6"
+                                                            CornerRadius="3"
+                                                            Background="{DynamicResource Theme.Success}"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,8,0" />
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding SummaryDisplay}"
+                                                               Style="{DynamicResource StatusValue}"
+                                                               TextWrapping="Wrap" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- Role matrix of the selected template: roles, routes, stages and required documents. -->
+            <Border Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Style="{StaticResource StudioCard}"
+                    Visibility="{Binding IsRoleMatrixMode, Converter={StaticResource BoolToVisibility}}">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Style="{DynamicResource PanelHeaderBorder}">
+                        <TextBlock Text="Матрица ролей выбранного шаблона"
+                                   Style="{DynamicResource SectionHeaderText}"
+                                   Margin="0" />
+                    </Border>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,4,0,4">
+                        <TextBlock Text="{Binding RoleMatrixNote}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   FontSize="10"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding RoleMatrixSummary}"
+                                   Style="{DynamicResource StatusValue}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,4,0,0" />
+                        <TextBlock Text="{Binding SelectedTemplateDisplay}"
+                                   Style="{DynamicResource SecondaryText}"
+                                   FontSize="10"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,4,4,0">
+                        <ItemsControl ItemsSource="{Binding RoleMatrix}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{DynamicResource TimelineCard}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding RoleDisplay}"
+                                                       FontWeight="SemiBold"
+                                                       FontSize="11" />
+                                            <TextBlock Text="{Binding SummaryDisplay}"
+                                                       Style="{DynamicResource SecondaryText}"
+                                                       FontSize="10"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

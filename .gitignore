@@ -1,0 +1,45 @@
+# Build results
+bin/
+obj/
+artifacts/
+TestResults/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Runtime profiles, credentials, and local configuration
+.env
+.env.*
+!.env.example
+secrets.json
+appsettings.Local.json
+appsettings.*.Local.json
+*.pfx
+*.p12
+*.log
+*.binlog
+*.tmp
+*.bak
+*.orig
+*.rej
+node_modules/
+/profiles/
+/logs/
+/exports/
+/.grokbot-runs/
+
+# Private working notes and review output
+/.review-evidence*/
+/.roo/
+/.zwork/
+/$root/
+/docs/work/
+/INDEPENDENT*REVIEW*.md
+/REVIEW_*.md

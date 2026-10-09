@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:llmworkgui:protocols:cursor:acp-session-new-schema",
+  "schemaVersion": 1,
+  "protocol": "cursor-agent-acp",
+  "agentVersion": "2026.09.15-d2fe57e",
+  "capturedAt": "2026-09-22",
+  "title": "ACP session/new call (Cursor Agent)",
+  "description": "Sanitized JSON Schema of the Cursor Agent ACP `session/new` call captured during the Phase 0 handshake probe. The mandatory params are `cwd` (string) and `mcpServers` (array); the agent rejects a call where either is missing. Runtime validation tolerates additional agent/client fields, therefore additionalProperties is enabled on the params object.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "jsonrpc",
+    "id",
+    "method",
+    "params"
+  ],
+  "properties": {
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": [
+        "integer",
+        "string"
+      ],
+      "description": "JSON-RPC request id."
+    },
+    "method": {
+      "const": "session/new"
+    },
+    "params": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "cwd",
+        "mcpServers"
+      ],
+      "properties": {
+        "cwd": {
+          "type": "string",
+          "description": "Absolute workspace directory the session is bound to; the GUI passes the selected project checkout."
+        },
+        "mcpServers": {
+          "type": "array",
+          "description": "MCP servers the agent may use. An empty array is a valid minimal value.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string",
+                "description": "Executable for a stdio MCP server."
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "type": {
+                "enum": [
+                  "stdio",
+                  "http",
+                  "sse"
+                ],
+                "description": "Transport hint; http and sse are supported by the agent (see acp-capabilities.json)."
+              },
+              "url": {
+                "type": "string",
+                "description": "Endpoint for http/sse MCP servers."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "session/new",
+      "params": {
+        "cwd": "C:\\workspace\\demo-app",
+        "mcpServers": []
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "session/new",
+      "params": {
+        "cwd": "C:\\workspace\\demo-app",
+        "mcpServers": [
+          {
+            "name": "demo-filesystem",
+            "command": "node",
+            "args": [
+              "C:\\workspace\\demo-app\\tools\\demo-mcp-server.js"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

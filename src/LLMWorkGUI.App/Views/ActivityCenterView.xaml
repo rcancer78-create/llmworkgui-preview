@@ -1,0 +1,394 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.ActivityCenterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:LLMWorkGUI.App.Converters"
+             xmlns:stateControls="clr-namespace:LLMWorkGUI.App.Views.StateControls"
+             xmlns:views="clr-namespace:LLMWorkGUI.App.Views"
+             Background="{DynamicResource Theme.Background}"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True"
+             TextOptions.TextFormattingMode="Display">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LLMWorkGUI.App;component/Themes/Shared.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+            <Style x:Key="FilterGroupHeader" TargetType="TextBlock" BasedOn="{StaticResource StatusLabel}">
+                <Setter Property="Margin" Value="0,0,4,0" />
+            </Style>
+
+            <Style x:Key="FilterToggle" TargetType="CheckBox">
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Text.Primary}" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid x:Name="ActivityCenterRoot" Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding Title}" Style="{DynamicResource ScreenHeaderText}" />
+                <TextBlock Text="{Binding Description}" Style="{DynamicResource SecondaryText}" FontSize="10" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="TotalCountText"
+                           Text="{Binding TotalCountDisplay}"
+                           Style="{DynamicResource StatusValue}"
+                           Margin="0,0,10,0" />
+                <TextBlock x:Name="FilteredCountText"
+                           Text="{Binding FilteredCountDisplay}"
+                           Style="{DynamicResource StatusLabel}"
+                           Margin="0,0,10,0" />
+                <CheckBox x:Name="AutoScrollCheckBox"
+                          Content="Автопрокрутка"
+                          IsChecked="{Binding AutoScroll, Mode=TwoWay}"
+                          Style="{StaticResource FilterToggle}"
+                          AutomationProperties.Name="Автоматически прокручивать к новейшему событию" />
+                <Button x:Name="RefreshButton"
+                        Content="Обновить"
+                        Command="{Binding RefreshCommand}"
+                        Style="{DynamicResource CompactButton}"
+                        AutomationProperties.Name="Обновить поток активности" />
+                <Button x:Name="ResetFiltersButton"
+                        Content="Сбросить фильтры"
+                        Command="{Binding ResetFiltersCommand}"
+                        Style="{DynamicResource CompactButton}"
+                        Margin="4,0,0,0"
+                        AutomationProperties.Name="Сбросить все фильтры активности" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource Theme.Surface.Alt}"
+                BorderBrush="{DynamicResource Theme.Border}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="8,6"
+                Margin="0,0,0,4">
+            <StackPanel>
+                <WrapPanel>
+                    <TextBlock Text="Период:" Style="{StaticResource FilterGroupHeader}" />
+                    <ComboBox x:Name="TimeRangeComboBox"
+                              ItemsSource="{Binding TimeRangeOptions}"
+                              SelectedItem="{Binding SelectedTimeRangeOption, Mode=TwoWay}"
+                              DisplayMemberPath="Display"
+                              MinWidth="140"
+                              FontSize="11"
+                              Margin="0,0,12,0"
+                              AutomationProperties.Name="Filter by time window" />
+
+                    <TextBlock Text="Источник:" Style="{StaticResource FilterGroupHeader}" />
+                    <ComboBox x:Name="SourceComboBox"
+                              ItemsSource="{Binding SourceOptions}"
+                              SelectedItem="{Binding SelectedSourceOption, Mode=TwoWay}"
+                              DisplayMemberPath="Display"
+                              MinWidth="110"
+                              FontSize="11"
+                              Margin="0,0,12,0"
+                              AutomationProperties.Name="Filter by native or synthetic source" />
+
+                    <TextBlock Text="Поиск:" Style="{StaticResource FilterGroupHeader}" />
+                    <TextBox x:Name="SearchBox"
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                             MinWidth="220"
+                             FontSize="11"
+                             VerticalContentAlignment="Center"
+                             Margin="0,0,4,0"
+                             AutomationProperties.Name="Full-text search over redacted activity" />
+                </WrapPanel>
+
+                <WrapPanel Margin="0,6,0,0">
+                    <TextBlock Text="Роли:" Style="{StaticResource FilterGroupHeader}" />
+                    <ItemsControl ItemsSource="{Binding RoleFilters}" VerticalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Display}"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          Style="{StaticResource FilterToggle}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </WrapPanel>
+
+                <WrapPanel Margin="0,4,0,0">
+                    <TextBlock Text="Состояния:" Style="{StaticResource FilterGroupHeader}" />
+                    <ItemsControl ItemsSource="{Binding StateFilters}" VerticalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Display}"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          Style="{StaticResource FilterToggle}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </WrapPanel>
+
+                <TextBlock Text="{Binding SearchNote}"
+                           Style="{DynamicResource SecondaryText}"
+                           FontSize="9"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="340" MinWidth="260" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <ListBox x:Name="EventsList"
+                         ItemsSource="{Binding Events}"
+                         SelectedItem="{Binding SelectedEvent, Mode=TwoWay}"
+                         Background="{DynamicResource Theme.Surface}"
+                         BorderBrush="{DynamicResource Theme.Border}"
+                         BorderThickness="1"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.CanContentScroll="True"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         VirtualizingPanel.ScrollUnit="Item"
+                         AutomationProperties.Name="Activity events">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{DynamicResource TimelineCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding TimestampDisplay}"
+                                                   Style="{DynamicResource SecondaryText}"
+                                                   FontFamily="Consolas"
+                                                   FontSize="10"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding RoleDisplay}"
+                                                   FontWeight="SemiBold"
+                                                   Margin="8,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                        <Border Style="{DynamicResource BadgeBorder}">
+                                            <TextBlock Text="{Binding StateDisplay}" Style="{DynamicResource BadgeText}" />
+                                        </Border>
+                                        <Border Style="{DynamicResource BadgeBorder}">
+                                            <TextBlock Text="{Binding KindDisplay}" Style="{DynamicResource BadgeText}" />
+                                        </Border>
+                                        <Border Style="{DynamicResource SyntheticBadgeBorder}"
+                                                Visibility="{Binding IsSynthetic, Converter={StaticResource BoolToVisibility}}">
+                                            <TextBlock Text="SYNTHETIC" Style="{DynamicResource SyntheticBadgeText}" />
+                                        </Border>
+                                        <Border Style="{DynamicResource BadgeBorder}"
+                                                Visibility="{Binding HasDetails, Converter={StaticResource BoolToVisibility}}">
+                                            <TextBlock Text="{Binding DetailsBadge}" Style="{DynamicResource BadgeText}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Title}"
+                                               FontWeight="SemiBold"
+                                               Margin="0,3,0,0"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding DescriptionPreview}"
+                                               Style="{DynamicResource SecondaryText}"
+                                               FontSize="10"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Grid Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}">
+                    <stateControls:EmptyStateView DataContext="{Binding EmptyState}" />
+                </Grid>
+
+                <Grid Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                    <stateControls:LoadingStateView DataContext="{Binding LoadingState}" />
+                </Grid>
+
+                <Grid Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                    <stateControls:ErrorStateView DataContext="{Binding ErrorState}" />
+                </Grid>
+            </Grid>
+
+            <GridSplitter Grid.Column="1" Style="{DynamicResource PanelSplitter}" />
+
+            <Border Grid.Column="2"
+                    Background="{DynamicResource Theme.Surface}"
+                    BorderBrush="{DynamicResource Theme.Border}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="8">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Подробности события" Style="{DynamicResource SectionHeaderText}" Margin="0,0,0,4" />
+
+                        <TextBlock x:Name="SelectionPlaceholder"
+                                   Text="Выберите событие для просмотра подробностей."
+                                   Style="{DynamicResource EmptyStateText}"
+                                   Visibility="{Binding HasSelection, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                        <StackPanel Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisibility}}">
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Роль" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.RoleDisplay}" Style="{DynamicResource StatusValue}" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Состояние" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.StateDisplay}" Style="{DynamicResource StatusValue}" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Источник" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.SourceDisplay}" Style="{DynamicResource StatusValue}" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Время" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.TimestampDisplay}" Style="{DynamicResource StatusValue}" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Маршрут" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.RouteDisplay}" Style="{DynamicResource StatusValue}" TextWrapping="Wrap" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Сессия" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.SessionDisplay}" Style="{DynamicResource StatusValue}" TextWrapping="Wrap" />
+                            </WrapPanel>
+                            <WrapPanel Margin="0,2">
+                                <TextBlock Text="Выполнение" Style="{DynamicResource StatusLabel}" MinWidth="72" />
+                                <TextBlock Text="{Binding SelectedEvent.ExecutionDisplay}" Style="{DynamicResource StatusValue}" TextWrapping="Wrap" />
+                            </WrapPanel>
+
+                            <TextBlock Text="{Binding SelectedEvent.Title}"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       Margin="0,8,0,2" />
+                            <TextBlock Text="{Binding SelectedEvent.Description}"
+                                       Style="{DynamicResource SecondaryText}"
+                                       TextWrapping="Wrap" />
+
+                            <Button x:Name="OpenDiffButton"
+                                    Content="Открыть diff / артефакт"
+                                    Command="{Binding OpenSelectedDiffCommand}"
+                                    Style="{DynamicResource CompactButton}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,10,0,0"
+                                    Visibility="{Binding SelectedEvent.HasDetails, Converter={StaticResource BoolToVisibility}}"
+                                    AutomationProperties.Name="Открыть выбранный diff или артефакт" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Background="{DynamicResource Theme.Surface.Alt}"
+                BorderBrush="{DynamicResource Theme.Border}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="8"
+                Margin="0,4,0,0"
+                Visibility="{Binding IsDiffViewerOpen, Converter={StaticResource BoolToVisibility}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <TextBlock Text="Diff / артефакт"
+                               Style="{DynamicResource SectionHeaderText}"
+                               Margin="0"
+                               VerticalAlignment="Center" />
+                    <Button x:Name="CloseDiffViewerButton"
+                            Content="Закрыть"
+                            Command="{Binding CloseDiffViewerCommand}"
+                            Style="{DynamicResource CompactButton}"
+                            HorizontalAlignment="Right"
+                            AutomationProperties.Name="Закрыть просмотр diff или артефакта" />
+                </Grid>
+                <views:DiffArtifactViewerView x:Name="DiffViewerPane"
+                                              Grid.Row="1"
+                                              DataContext="{Binding DiffViewer}" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="4" Margin="0,4,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="TruncationText"
+                       Grid.Column="0"
+                       Text="{Binding TruncationDisplay}"
+                       Style="{DynamicResource SecondaryText}"
+                       FontSize="10"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding IsTruncated, Converter={StaticResource BoolToVisibility}}" />
+
+            <!-- Retention is never silent. The label is always present once events exist, and turns into
+                 the explicit overflow statement as soon as the bound has dropped anything. -->
+            <Border x:Name="OverflowBadge"
+                    Grid.Column="1"
+                    Style="{DynamicResource BadgeBorder}"
+                    Margin="6,0,0,0"
+                    VerticalAlignment="Center"
+                    ToolTip="Сколько событий удержано, сколько вытеснено и что осталось в постоянном журнале.">
+                <TextBlock x:Name="OverflowText"
+                           Text="{Binding OverflowDisplay}"
+                           Style="{DynamicResource BadgeText}"
+                           FontSize="10" />
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+            <Button x:Name="FirstPageButton"
+                    Content="⏮ Первая"
+                    Command="{Binding FirstPageCommand}"
+                    Style="{DynamicResource CompactButton}"
+                    AutomationProperties.Name="Перейти к первой странице событий" />
+            <Button x:Name="PreviousPageButton"
+                    Content="← Назад"
+                    Command="{Binding PreviousPageCommand}"
+                    Style="{DynamicResource CompactButton}"
+                    Margin="4,0,0,0"
+                    AutomationProperties.Name="Перейти к предыдущей странице событий" />
+            <TextBlock x:Name="PageText"
+                       Text="{Binding PageDisplay}"
+                       Style="{DynamicResource StatusValue}"
+                       VerticalAlignment="Center"
+                       Margin="10,0" />
+            <Button x:Name="NextPageButton"
+                    Content="Вперёд →"
+                    Command="{Binding NextPageCommand}"
+                    Style="{DynamicResource CompactButton}"
+                    AutomationProperties.Name="Перейти к следующей странице событий" />
+        </StackPanel>
+    </Grid>
+</UserControl>

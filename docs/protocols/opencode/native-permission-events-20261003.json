@@ -1,0 +1,173 @@
+{
+  "origin": {
+    "captureSource": "artifacts/remaining-work-20261003/opencode-permissions/native-ui-events-r1/captured-permission-events.json",
+    "captureSha256": "CD91F5033510FC7AE1423D37987C44C2421D76FF5C630CB4B1E966A903E12207",
+    "openApiSource": "artifacts/remaining-work-20261003/opencode-permissions/native-ui-events-r1/native-openapi.json",
+    "openApiSha256": "46DB986090AAE41846CD6DBE16225A1D883F0BBCB4C48814008D3F6CE140AA5C",
+    "apiInfoVersion": "1.0.0",
+    "resultSha256": "11234265339C34FEE8A4FF3EC6DFED7AF5565A57D2DEE24EF7CE03C4B98DFA17",
+    "nativeSessionId": "ses_f01f08097ffeNmHe6JMfWiQdEp",
+    "scope": "Actual loopback permission.asked/replied events for one owned synthetic write/reject probe through production command. Only these two event types captured, parsed/canonicalized and CredentialTextRedactor applied; published fixture workspace paths normalized to declared C:\\workspace\\demo-app placeholders, while captureSha256 refers to the unchanged historical capture; no reasoning/message/tool-output capture. apiInfoVersion is API metadata, not CLI version or account/model identity proof."
+  },
+  "schemas": {
+    "EventPermissionAsked": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^evt_"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "permission.asked"
+          ]
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^per"
+            },
+            "sessionID": {
+              "type": "string",
+              "pattern": "^ses"
+            },
+            "permission": {
+              "type": "string"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "metadata": {
+              "type": "object"
+            },
+            "always": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "tool": {
+              "type": "object",
+              "properties": {
+                "messageID": {
+                  "type": "string"
+                },
+                "callID": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "messageID",
+                "callID"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "id",
+            "sessionID",
+            "permission",
+            "patterns",
+            "metadata",
+            "always"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "properties"
+      ],
+      "additionalProperties": false
+    },
+    "EventPermissionReplied": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^evt_"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "permission.replied"
+          ]
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "sessionID": {
+              "type": "string",
+              "pattern": "^ses"
+            },
+            "requestID": {
+              "type": "string",
+              "pattern": "^per"
+            },
+            "reply": {
+              "type": "string",
+              "enum": [
+                "once",
+                "always",
+                "reject"
+              ]
+            }
+          },
+          "required": [
+            "sessionID",
+            "requestID",
+            "reply"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "properties"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "capturedEvents": [
+    {
+      "id": "evt_0fe0fa59a0023ytMpbYCrAk1B6",
+      "type": "permission.asked",
+      "properties": {
+        "id": "per_0fe0fa59a001oana7XSDdFS5Ba",
+        "sessionID": "ses_f01f08097ffeNmHe6JMfWiQdEp",
+        "permission": "edit",
+        "patterns": [
+          "artifacts\\remaining-work-20261003\\opencode-permissions\\native-ui-events-r1\\empty-workspace\\deny-write-probe.txt"
+        ],
+        "metadata": {
+          "filepath": "C:\\workspace\\demo-app\\deny-write-probe.txt",
+          "diff": "Index: C:\\workspace\\demo-app\\deny-write-probe.txt\n===================================================================\n--- C:\\workspace\\demo-app\\deny-write-probe.txt\n+++ C:\\workspace\\demo-app\\deny-write-probe.txt\n@@ -0,0 +1,1 @@\n+PERMISSION_DENIAL_SHOULD_PREVENT_WRITE\n\\ No newline at end of file\n"
+        },
+        "always": [
+          "*"
+        ],
+        "tool": {
+          "messageID": "msg_0fe0f8196001wAOaoJ7Pl4Ea7y",
+          "callID": "call-327c2ec3-adf0-46e9-962c-ad04ec64ec8f-0"
+        }
+      }
+    },
+    {
+      "id": "evt_0fe0fa66a001dH4u15nFf70l0L",
+      "type": "permission.replied",
+      "properties": {
+        "sessionID": "ses_f01f08097ffeNmHe6JMfWiQdEp",
+        "requestID": "per_0fe0fa59a001oana7XSDdFS5Ba",
+        "reply": "reject"
+      }
+    }
+  ]
+}

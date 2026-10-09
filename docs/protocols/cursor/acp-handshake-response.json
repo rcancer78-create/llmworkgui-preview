@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "protocol": "cursor-agent-acp",
+  "agentVersion": "2026.09.15-d2fe57e",
+  "capturedAt": "2026-09-22",
+  "transport": "stdio",
+  "evidence": "Sanitized initialize exchange captured from a real `cursor-agent acp` process. JSON-RPC 2.0 frames over stdio; no credentials, tokens, private paths or user data are included.",
+  "sanitization": {
+    "workspace": "C:\\workspace\\demo-app",
+    "account": "user@example.com",
+    "note": "Probe-local identifiers were replaced with fixed placeholders; the exchange itself contains neither credentials nor private paths."
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": 1,
+      "clientInfo": {
+        "name": "LLMWorkGUI",
+        "version": "1.0.0"
+      },
+      "capabilities": {}
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "protocolVersion": 1,
+      "agentCapabilities": {
+        "loadSession": true,
+        "mcpCapabilities": {
+          "http": true,
+          "sse": true
+        },
+        "promptCapabilities": {
+          "audio": false,
+          "embeddedContext": false,
+          "image": true
+        },
+        "sessionCapabilities": {
+          "list": {}
+        }
+      },
+      "authMethods": [
+        {
+          "id": "cursor_login",
+          "name": "Cursor Login",
+          "description": "Authenticate using existing Cursor login credentials. Run 'agent login' first if not logged in."
+        }
+      ]
+    }
+  },
+  "observations": [
+    "protocolVersion is the JSON number 1, not a string; the handshake comparison must be numeric.",
+    "agentCapabilities.loadSession=true allows session/load of a persisted native session.",
+    "sessionCapabilities.list is present as an empty object; its presence is capability evidence, not a typed payload contract.",
+    "authMethods is descriptive metadata only; LLMWorkGUI never extracts or stores Cursor credentials."
+  ]
+}

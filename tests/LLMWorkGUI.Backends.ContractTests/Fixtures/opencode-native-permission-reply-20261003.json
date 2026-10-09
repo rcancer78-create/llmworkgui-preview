@@ -1,0 +1,33 @@
+{
+  "origin": {
+    "sourcePath": "artifacts\\remaining-work-20261003\\security-snapshot\\native-permission-ask-reject-r2\\native-openapi.json",
+    "sourceSha256": "46DB986090AAE41846CD6DBE16225A1D883F0BBCB4C48814008D3F6CE140AA5C",
+    "operation": "POST /permission/{requestID}/reply",
+    "nativeApiInfo": {
+      "title": "opencode",
+      "version": "1.0.0",
+      "description": "opencode api"
+    },
+    "scope": "Public native OpenAPI schema captured before serializer change; no request data/auth/reasoning"
+  },
+  "requestBodySchema": {
+    "type": "object",
+    "properties": {
+      "reply": {
+        "type": "string",
+        "enum": [
+          "once",
+          "always",
+          "reject"
+        ]
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "reply"
+    ],
+    "additionalProperties": false
+  }
+}

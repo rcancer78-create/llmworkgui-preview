@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LLMWorkGUI.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LLMWorkGUI.Domain\LLMWorkGUI.Domain.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Application\LLMWorkGUI.Application.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Backends.OpenCode\LLMWorkGUI.Backends.OpenCode.csproj" />
+    <ProjectReference Include="..\LLMWorkGUI.Backends.CursorAcp\LLMWorkGUI.Backends.CursorAcp.csproj" />
+    <ProjectReference Include="..\LLMGateway.Core\LLMGateway.Core.csproj" />
+    <ProjectReference Include="..\LLMGateway.Native\LLMGateway.Native.csproj" />
+    <ProjectReference Include="..\LLMGateway.Server\LLMGateway.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+    <!-- Override the vulnerable 2.1.6 native bundle brought by Microsoft.Data.Sqlite 8.0.8. -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Migrations\*.sql" />
+    <Content Include="GrokBot\Runtime\*" Link="GrokBot\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

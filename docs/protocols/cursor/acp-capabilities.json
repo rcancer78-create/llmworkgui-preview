@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "protocol": "cursor-agent-acp",
+  "agentVersion": "2026.09.15-d2fe57e",
+  "capturedAt": "2026-09-22",
+  "evidence": "Sanitized capability matrix for Cursor Agent ACP built from the Phase 0 initialize probe, session/new requirements and the CLI capability snapshot. No credentials, tokens or private paths are included.",
+  "sanitization": {
+    "workspace": "C:\\workspace\\demo-app",
+    "account": "user@example.com",
+    "note": "Probe-local identifiers were replaced with fixed placeholders."
+  },
+  "transport": {
+    "id": "acp-stdio",
+    "command": "cursor-agent acp",
+    "framing": "newline-delimited JSON-RPC 2.0 over stdio",
+    "protocolVersion": 1,
+    "state": "Supported"
+  },
+  "capabilities": [
+    {
+      "id": "acp.initialize",
+      "state": "Supported",
+      "evidence": "acp-handshake-response.json"
+    },
+    {
+      "id": "acp.authenticate.cursorLogin",
+      "state": "Supported",
+      "evidence": "authMethods[0].id=cursor_login; credentials are never extracted"
+    },
+    {
+      "id": "acp.session.new",
+      "state": "Supported",
+      "evidence": "requires cwd and mcpServers (acp-session-new-schema.json)"
+    },
+    {
+      "id": "acp.session.load",
+      "state": "Supported",
+      "evidence": "agentCapabilities.loadSession=true"
+    },
+    {
+      "id": "acp.session.list",
+      "state": "Supported",
+      "evidence": "agentCapabilities.sessionCapabilities.list={}"
+    },
+    {
+      "id": "acp.prompt",
+      "state": "Unknown",
+      "evidence": "handshake done, but prompt exchange fixture not captured in Phase 0"
+    },
+    {
+      "id": "acp.streaming.updates",
+      "state": "Unknown",
+      "evidence": "streaming events not captured in Phase 0 fixture"
+    },
+    {
+      "id": "acp.approvals",
+      "state": "Unknown",
+      "evidence": "permission request exchange not captured in Phase 0 fixture"
+    },
+    {
+      "id": "acp.cancel",
+      "state": "Unknown",
+      "evidence": "cancel exchange not captured in Phase 0 fixture"
+    },
+    {
+      "id": "acp.mcp.http",
+      "state": "Supported",
+      "evidence": "agentCapabilities.mcpCapabilities.http=true"
+    },
+    {
+      "id": "acp.mcp.sse",
+      "state": "Supported",
+      "evidence": "agentCapabilities.mcpCapabilities.sse=true"
+    },
+    {
+      "id": "acp.prompt.image",
+      "state": "Supported",
+      "evidence": "agentCapabilities.promptCapabilities.image=true"
+    },
+    {
+      "id": "acp.prompt.audio",
+      "state": "Unsupported",
+      "evidence": "agentCapabilities.promptCapabilities.audio=false"
+    },
+    {
+      "id": "acp.prompt.embeddedContext",
+      "state": "Unsupported",
+      "evidence": "agentCapabilities.promptCapabilities.embeddedContext=false"
+    },
+    {
+      "id": "models.discovery",
+      "state": "Supported",
+      "evidence": "acp-model-catalog.json"
+    },
+    {
+      "id": "models.overrides.parameterized",
+      "state": "Supported",
+      "evidence": "override syntax <baseModelId>[context=...,effort=...]"
+    },
+    {
+      "id": "quota.api",
+      "state": "Unsupported",
+      "evidence": "Cursor Agent/ACP exposes no quota API; quota is never derived from indirect signals"
+    },
+    {
+      "id": "quota.estimated",
+      "state": "Unknown",
+      "evidence": "no reliable local estimator was confirmed in Phase 0"
+    }
+  ],
+  "modes": [
+    {
+      "id": "plan",
+      "name": "Plan",
+      "access": "read-only",
+      "state": "Unknown",
+      "note": "mode payload отсутствует в handshake response; writer-lock exemption без доказанного runtime mode payload запрещён"
+    },
+    {
+      "id": "ask",
+      "name": "Ask",
+      "access": "read-only",
+      "state": "Unknown",
+      "note": "mode payload отсутствует в handshake response; writer-lock exemption без доказанного runtime mode payload запрещён"
+    },
+    {
+      "id": "agent",
+      "name": "Agent",
+      "access": "write",
+      "state": "Unknown",
+      "note": "mode payload отсутствует в handshake response; writer-lock exemption без доказанного runtime mode payload запрещён"
+    }
+  ],
+  "diagnosticCliFallback": {
+    "command": "cursor-agent --print --mode ask",
+    "scope": "read-only diagnostics only",
+    "visibleToUser": true,
+    "replacesAcp": false,
+    "note": "Used only for operations missing from ACP; never a silent fallback."
+  },
+  "quotaPolicy": {
+    "api": "Unsupported",
+    "dashboardState": "Unsupported/Unknown",
+    "inferenceAllowed": false
+  }
+}

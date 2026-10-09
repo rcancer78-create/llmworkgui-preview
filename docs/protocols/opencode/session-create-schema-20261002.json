@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "properties": {
+    "parentID": {
+      "type": "string",
+      "pattern": "^ses"
+    },
+    "title": {
+      "type": "string"
+    },
+    "agent": {
+      "type": "string"
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "providerID": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "providerID"
+      ],
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "permission": {
+      "$ref": "#/components/schemas/PermissionRuleset"
+    },
+    "workspaceID": {
+      "type": "string",
+      "pattern": "^wrk"
+    }
+  },
+  "additionalProperties": false
+}

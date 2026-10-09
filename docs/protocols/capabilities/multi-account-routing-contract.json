@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "artifactId": "multi-account-routing-contract",
+  "status": "Accepted",
+  "capturedAt": "2026-09-22",
+  "taskId": "TASK-004",
+  "evidence": "Normative multi-account bridge contract derived from TECHNICAL_SPECIFICATION.md sections 6.4, 6.5 and 6.6, ADR-0002 section 7, ADR-0003 section 8 and the Phase 0 environment probe: OpenCode has no external multi-account plugins, Codex uses separate `.codex_*` profiles, and no quota API was confirmed. No credentials, tokens or private user paths are included.",
+  "sanitization": {
+    "workspace": "C:\\workspace\\demo-app",
+    "account": "user@example.com",
+    "note": "Probe-local identifiers were replaced with fixed placeholders; secret values are never recorded."
+  },
+  "routingAuthority": {
+    "component": "RoutingEngine",
+    "rule": "The application Routing Engine is the only component that selects an account/route for a GUI-managed session.",
+    "singleWriter": true,
+    "decisionPersisted": true
+  },
+  "isolationModel": {
+    "unit": "ProviderProfile",
+    "perProfileInstance": true,
+    "sharedServerAllowed": false,
+    "accountBoundaryFallback": "If pin/isolation inside one instance cannot be proven, the instance boundary narrows to a single account.",
+    "credentials": "Credentials stay with OpenCode/plugin or in Windows secret storage; the application never extracts or displays OAuth refresh tokens.",
+    "forbidden": [
+      "hidden third-party multi-account plugins",
+      "undocumented credential files",
+      "cross-account execution inside one instance without proven isolation"
+    ]
+  },
+  "bridgeCapabilities": {
+    "required": [
+      "account.discovery",
+      "account.pin",
+      "account.observedRoute",
+      "autoRotation.disable",
+      "quota.read",
+      "health.read"
+    ],
+    "optional": [
+      "quota.refresh"
+    ],
+    "unsupportedBehavior": "A plugin without pin or observed route evidence is not admitted to automatic multi-account modes and is exposed as one opaque provider route.",
+    "silentFallbackAllowed": false
+  },
+  "pin": {
+    "required": true,
+    "scope": "per execution and per native session binding",
+    "beforePrompt": true,
+    "pinTarget": [
+      "backend",
+      "providerProfile",
+      "account",
+      "model",
+      "reasoning",
+      "speed",
+      "mode"
+    ],
+    "pinMustBeAcknowledged": true,
+    "failureOutcome": "PinFailure",
+    "shadowPinAllowed": false
+  },
+  "autoRotation": {
+    "forGuiManagedSessions": "Disabled",
+    "pluginRotationMayOverridePin": false,
+    "opaquePluginRoute": "one opaque provider route that is excluded from automatic multi-account modes",
+    "evidenceRequired": true
+  },
+  "routeEvidence": {
+    "requestedRoute": {
+      "fields": [
+        "backend",
+        "providerProfile",
+        "account",
+        "model",
+        "reasoning",
+        "speed",
+        "mode"
+      ],
+      "source": "routing decision",
+      "persisted": true
+    },
+    "observedRoute": {
+      "fields": [
+        "backend",
+        "providerProfile",
+        "account",
+        "model",
+        "reasoning",
+        "speed",
+        "mode"
+      ],
+      "source": "backend or plugin evidence",
+      "persisted": true
+    },
+    "comparisonRequired": true,
+    "comparisonFields": [
+      "backend",
+      "providerProfile",
+      "account",
+      "model",
+      "reasoning",
+      "speed",
+      "mode"
+    ],
+    "missingObservedRouteOutcome": "RouteMismatch",
+    "treatRequestedAsObservedAllowed": false
+  },
+  "routeMismatch": {
+    "code": "RouteMismatch",
+    "conditions": [
+      "observedRoute is missing while the routing mode requires route evidence",
+      "observedRoute differs from requestedRoute in any binding field",
+      "the pin was rejected or silently ignored by the backend/plugin",
+      "plugin auto-rotation changed account/model/variant after the pin"
+    ],
+    "outcomes": [
+      "the execution terminates as RouteMismatch",
+      "the binding is not continued",
+      "the execution is not counted as success",
+      "automatic failover and prompt resend are forbidden",
+      "requestedRoute and observedRoute evidence is preserved and shown to the user"
+    ],
+    "successCounted": false,
+    "retryBudgetConsumed": false
+  },
+  "opaqueRoutePolicy": {
+    "allowedInModes": [
+      "ManualOnly"
+    ],
+    "marking": "OpaqueRoute",
+    "countsAsVerifiedRoute": false,
+    "requiresUserAcknowledgement": true
+  },
+  "binding": {
+    "fields": [
+      "backend",
+      "providerProfile",
+      "account",
+      "model",
+      "reasoning",
+      "speed",
+      "mode"
+    ],
+    "immutableAfterNativeSession": true,
+    "changeCreatesNewSession": true,
+    "ancestryReason": "RouteChange",
+    "forkRequiresNativeForkCapability": true
+  },
+  "bindingPriority": [
+    "explicit user selection for the new session",
+    "logical role binding of the active workflow version",
+    "project default policy",
+    "global application default policy"
+  ],
+  "routingModes": [
+    {
+      "id": "Pinned",
+      "description": "exact account/route",
+      "requiresPin": true,
+      "requiresObservedRoute": true,
+      "requiresFreshTrustedQuota": false,
+      "autoFailover": false,
+      "autoFailoverBeforeFirstPrompt": false,
+      "autoFailoverAfterSessionConfirmed": false,
+      "opaqueRouteAllowed": false
+    },
+    {
+      "id": "SessionSticky",
+      "description": "binding is selected once and kept until Reset/Close",
+      "requiresPin": true,
+      "requiresObservedRoute": true,
+      "requiresFreshTrustedQuota": false,
+      "autoFailover": false,
+      "autoFailoverBeforeFirstPrompt": false,
+      "autoFailoverAfterSessionConfirmed": false,
+      "opaqueRouteAllowed": false,
+      "onIneligibility": "stop the next turn and propose a replacement session; the prompt is not sent before user confirmation"
+    },
+    {
+      "id": "QuotaFirst",
+      "description": "maximum safe remaining quota",
+      "requiresPin": true,
+      "requiresObservedRoute": true,
+      "requiresFreshTrustedQuota": true,
+      "autoFailover": false,
+      "autoFailoverBeforeFirstPrompt": true,
+      "autoFailoverAfterSessionConfirmed": false,
+      "opaqueRouteAllowed": false
+    },
+    {
+      "id": "PriorityFirst",
+      "description": "user-defined order with eligibility gates",
+      "requiresPin": true,
+      "requiresObservedRoute": true,
+      "requiresFreshTrustedQuota": false,
+      "autoFailover": false,
+      "autoFailoverBeforeFirstPrompt": true,
+      "autoFailoverAfterSessionConfirmed": false,
+      "opaqueRouteAllowed": false
+    },
+    {
+      "id": "Balanced",
+      "description": "quota plus health plus load plus latency",
+      "requiresPin": true,
+      "requiresObservedRoute": true,
+      "requiresFreshTrustedQuota": true,
+      "autoFailover": false,
+      "autoFailoverBeforeFirstPrompt": true,
+      "autoFailoverAfterSessionConfirmed": false,
+      "opaqueRouteAllowed": false
+    },
+    {
+      "id": "ManualOnly",
+      "description": "never switch automatically",
+      "requiresPin": false,
+      "requiresObservedRoute": false,
+      "requiresFreshTrustedQuota": false,
+      "autoFailover": false,
+      "autoFailoverBeforeFirstPrompt": false,
+      "autoFailoverAfterSessionConfirmed": false,
+      "opaqueRouteAllowed": true
+    }
+  ],
+  "eligibilityGates": [
+    "route enabled",
+    "authentication valid",
+    "model available to the account",
+    "required reasoning/speed/mode supported",
+    "route not quarantined",
+    "quota gate passes per mode-specific rules",
+    "concurrency slot available",
+    "project data classification does not exceed route maxDataClass"
+  ],
+  "dataSensitivity": {
+    "levels": [
+      "PublicSource",
+      "PrivateSource",
+      "Restricted"
+    ],
+    "defaultForNewProject": "PrivateSource",
+    "customProviderDefault": "PublicSource",
+    "rule": "A route may receive data only up to its maxDataClass; credentials and discovered secrets are never sent."
+  },
+  "failoverRules": [
+    "before the first prompt automatic modes may choose another eligible account",
+    "after session confirmation or possible prompt delivery automatic resend is forbidden",
+    "Pinned and ManualOnly never perform automatic failover",
+    "SessionSticky stops the next turn on ineligibility and proposes a replacement session",
+    "failover never changes backend, provider profile, model, reasoning, speed or mode",
+    "Ambiguous executions are never resent automatically and do not consume the workflow retry budget"
+  ],
+  "quotaPolicy": {
+    "automaticScoringSources": [
+      "ExactProviderReported",
+      "PluginReported"
+    ],
+    "hardReserveSources": [
+      "ExactProviderReported",
+      "PluginReported"
+    ],
+    "nonNumericStates": [
+      "Stale",
+      "Unsupported",
+      "Unknown",
+      "Error"
+    ],
+    "nonNumericHaveNoNumericValue": true,
+    "nonNumericAreNeverShownAsZeroOrFull": true,
+    "fabricatedValuesAllowed": false,
+    "sharedSnapshotReference": "Dashboard and Routing Engine must reference the same quotaSnapshotId."
+  }
+}

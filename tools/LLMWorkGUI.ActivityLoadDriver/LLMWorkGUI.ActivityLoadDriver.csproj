@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Phase 11 normative event-load driver (ТЗ §9.2).
+
+    This project is a developer tool, not product runtime. Nothing under src/ references it.
+    It belongs to LLMWorkGUI.sln and is compiled by solution builds as a net10.0-windows WPF tool.
+    The visible acceptance run is launched explicitly on Windows:
+
+        pwsh -File scripts/Run-ActivityLoadAcceptance.ps1 -Mode smoke
+        pwsh -File scripts/Run-ActivityLoadAcceptance.ps1 -Mode full
+
+    It composes the production host over a temporary application-data root, shows the shipped MainWindow
+    with the unified workspace shell, drives the shipped Activity Center controls, and loads the stream
+    through the product ingestion boundary (IActivityCenterService.Append). It never launches the
+    unpackaged production App, never touches %LOCALAPPDATA%\LLMWorkGUI, never contacts an external
+    provider and never reads a credential.
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>LLMWorkGUI.ActivityLoadDriver</RootNamespace>
+    <AssemblyName>LLMWorkGUI.ActivityLoadDriver</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LLMWorkGUI.App\LLMWorkGUI.App.csproj" />
+    <ProjectReference Include="..\..\src\LLMWorkGUI.Application\LLMWorkGUI.Application.csproj" />
+    <ProjectReference Include="..\..\src\LLMWorkGUI.Domain\LLMWorkGUI.Domain.csproj" />
+    <ProjectReference Include="..\..\src\LLMWorkGUI.Infrastructure\LLMWorkGUI.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

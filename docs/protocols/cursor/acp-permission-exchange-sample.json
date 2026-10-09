@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "protocol": "cursor-agent-acp",
+  "agentVersion": "2026.09.15-d2fe57e",
+  "capturedAt": "2026-09-23",
+  "sanitization": {
+    "workspace": "C:\\workspace\\demo-app",
+    "account": "user@example.com",
+    "note": "Sanitized session/request_permission exchange fixture."
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "id": "perm-req-1",
+    "method": "session/request_permission",
+    "params": {
+      "sessionId": "sess-test-42",
+      "permissionId": "perm-req-1",
+      "description": "Read file README.md from workspace."
+    }
+  },
+  "reply": {
+    "jsonrpc": "2.0",
+    "id": "perm-req-1",
+    "result": {
+      "decision": "allow_once"
+    }
+  }
+}

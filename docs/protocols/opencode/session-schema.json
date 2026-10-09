@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:llmworkgui:protocols:opencode:session-schema",
+  "title": "OpenCode Session",
+  "description": "Sanitized JSON Schema of the OpenCode 1.18.31 session object discovered from a live probe of GET /session and GET /session/{sessionID} on a managed `opencode serve` instance. Runtime validation must tolerate additional provider/plugin fields, so additionalProperties is enabled.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "slug",
+    "projectID",
+    "directory",
+    "title",
+    "version",
+    "time"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ses_[A-Za-z0-9]+$",
+      "description": "Native OpenCode session identifier."
+    },
+    "slug": {
+      "type": "string",
+      "description": "Human-readable session slug."
+    },
+    "projectID": {
+      "type": "string",
+      "description": "Native project identifier the session belongs to."
+    },
+    "directory": {
+      "type": "string",
+      "description": "Workspace directory the session is bound to."
+    },
+    "parentID": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Parent session for forked or child sessions."
+    },
+    "summary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "additions": {
+          "type": "integer"
+        },
+        "deletions": {
+          "type": "integer"
+        },
+        "files": {
+          "type": "integer"
+        }
+      }
+    },
+    "cost": {
+      "type": "number",
+      "description": "Reported session cost; 0 when the provider does not report cost."
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "input": {
+          "type": "integer"
+        },
+        "output": {
+          "type": "integer"
+        },
+        "reasoning": {
+          "type": "integer"
+        },
+        "cache": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "read": {
+              "type": "integer"
+            },
+            "write": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "title": {
+      "type": "string"
+    },
+    "agent": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Agent used by the session when the backend reports one."
+    },
+    "model": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "modelID": {
+          "type": "string"
+        },
+        "providerID": {
+          "type": "string"
+        },
+        "variant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "description": "Requested model descriptor. It is not proof of the account actually used; observed route evidence requires plugin support."
+    },
+    "version": {
+      "type": "string",
+      "description": "OpenCode version that created the session."
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "created",
+        "updated"
+      ],
+      "properties": {
+        "created": {
+          "type": "integer"
+        },
+        "updated": {
+          "type": "integer"
+        }
+      }
+    },
+    "permission": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true,
+      "description": "Effective permission rules attached to the session. Shape is version and plugin dependent and must be treated as passthrough evidence."
+    }
+  }
+}

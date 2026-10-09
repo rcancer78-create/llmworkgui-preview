@@ -1,0 +1,91 @@
+<UserControl x:Class="LLMWorkGUI.App.Views.StateControls.ErrorStateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True"
+             TextOptions.TextFormattingMode="Display">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LLMWorkGUI.App;component/Themes/Shared.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border x:Name="StateRoot"
+            Background="{DynamicResource Theme.Warning.Surface}"
+            BorderBrush="{DynamicResource Theme.Error}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Padding="16,12"
+            Margin="8"
+            AutomationProperties.Name="Состояние ошибки">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="⚠"
+                           FontSize="22"
+                           Foreground="{DynamicResource Theme.Error}"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0" />
+                <TextBlock x:Name="TitleText"
+                           Text="{Binding Title}"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Theme.Error}"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <TextBlock x:Name="MessageText"
+                       Text="{Binding Message}"
+                       Style="{DynamicResource SecondaryText}"
+                       TextWrapping="Wrap"
+                       Margin="0,8,0,0" />
+
+            <WrapPanel Margin="0,10,0,0">
+                <Button x:Name="RetryButton"
+                        Content="Повторить"
+                        Command="{Binding RetryCommand}"
+                        Style="{DynamicResource CompactButton}"
+                        Visibility="{Binding HasRetry, Converter={StaticResource BoolToVisibility}}"
+                        AutomationProperties.Name="Повторить неудачную операцию" />
+                <Button x:Name="DetailsButton"
+                        Content="{Binding DetailsToggleLabel}"
+                        Command="{Binding ToggleDetailsCommand}"
+                        Style="{DynamicResource CompactButton}"
+                        Margin="6,0,0,0"
+                        Visibility="{Binding HasDetails, Converter={StaticResource BoolToVisibility}}"
+                        AutomationProperties.Name="Показать или скрыть технические подробности" />
+                <Button x:Name="CopyDetailsButton"
+                        Content="Копировать подробности"
+                        Command="{Binding CopyDetailsCommand}"
+                        Style="{DynamicResource CompactButton}"
+                        Margin="6,0,0,0"
+                        Visibility="{Binding HasDetails, Converter={StaticResource BoolToVisibility}}"
+                        AutomationProperties.Name="Копировать технические подробности ошибки" />
+                <TextBlock x:Name="CopyNoticeText"
+                           Text="{Binding CopyNotice}"
+                           Style="{DynamicResource SecondaryText}"
+                           FontSize="10"
+                           VerticalAlignment="Center"
+                           Margin="8,0,0,0"
+                           Visibility="{Binding HasCopyNotice, Converter={StaticResource BoolToVisibility}}" />
+            </WrapPanel>
+
+            <TextBox x:Name="DetailsBox"
+                     Text="{Binding TechnicalDetails, Mode=OneWay}"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     MaxHeight="160"
+                     VerticalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Disabled"
+                     FontFamily="Consolas"
+                     FontSize="11"
+                     Margin="0,10,0,0"
+                     Visibility="{Binding IsDetailsExpanded, Converter={StaticResource BoolToVisibility}}"
+                     AutomationProperties.Name="Технические подробности ошибки" />
+        </StackPanel>
+    </Border>
+</UserControl>
