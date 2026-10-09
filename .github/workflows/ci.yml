@@ -154,18 +154,28 @@ jobs:
               $notices | Copy-Item -Destination $destination
             }
           }
-          foreach ($runtimePack in @('microsoft.netcore.app.runtime.win-x64', 'microsoft.windowsdesktop.app.runtime.win-x64')) {
+          $runtimeConfig = Get-Content (Join-Path $output 'LLMWorkGUI.App.runtimeconfig.json') -Raw | ConvertFrom-Json
+          $includedFrameworks = @($runtimeConfig.runtimeOptions.includedFrameworks)
+          if ($includedFrameworks.Count -eq 0) { throw 'Self-contained runtime framework metadata is missing' }
+          foreach ($framework in $includedFrameworks) {
+            $runtimePack = "$($framework.name.ToLowerInvariant()).runtime.win-x64"
+            $runtimeVersion = $framework.version
             $runtimeNotices = @($packageRoots | ForEach-Object {
-              $packRoot = Join-Path $_ $runtimePack
+              $packRoot = Join-Path $_ "$runtimePack/$runtimeVersion"
               if (Test-Path -LiteralPath $packRoot -PathType Container) {
-                Get-ChildItem -LiteralPath $packRoot -Directory -Filter '10.0.*' | ForEach-Object {
-                  Get-ChildItem -LiteralPath $_.FullName -File | Where-Object { $_.Name -match '^(license|third[-_]party)' }
-                }
+                Get-ChildItem -LiteralPath $packRoot -File | Where-Object { $_.Name -match '^(license|third[-_]party)' }
               }
             })
-            if ($runtimeNotices.Count -lt 2) { throw "Expected runtime license and third-party notices were not found for $runtimePack" }
+            if (-not ($runtimeNotices | Where-Object Name -Match '^license(?:\.|$)')) {
+              throw "Runtime license was not found for $runtimePack/$runtimeVersion"
+            }
+            # WindowsDesktop ships a single MIT LICENSE; Core and ASP.NET also ship a third-party notice.
+            if ($framework.name -ne 'Microsoft.WindowsDesktop.App' -and
+                -not ($runtimeNotices | Where-Object Name -Match '^third[-_]party')) {
+              throw "Runtime third-party notices were not found for $runtimePack/$runtimeVersion"
+            }
             foreach ($notice in $runtimeNotices) {
-              $destination = Join-Path $noticeRoot "$runtimePack/$($notice.Directory.Name)"
+              $destination = Join-Path $noticeRoot "$runtimePack/$runtimeVersion"
               New-Item -ItemType Directory -Force $destination | Out-Null
               Copy-Item -LiteralPath $notice.FullName -Destination $destination
             }
