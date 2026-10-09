@@ -1,3 +1,4 @@
+using LLMWorkGUI.Application.Cli;
 using LLMWorkGUI.Application.Concurrency;
 using LLMWorkGUI.Application.Reconciliation;
 using LLMWorkGUI.Application.Repositories;
@@ -24,7 +25,12 @@ public sealed class StartupReconciliationTests : IDisposable
     {
         await SeedAbandonedSessionsAsync();
 
-        using var host = HostBootstrapper.BuildHost(appDataDirectory: _database.Root);
+        // This case exercises a vanished process with an available backend. The
+        // separate BackendMissing cases cover machines without an installed CLI.
+        using var host = HostBootstrapper.CreateHostBuilder(appDataDirectory: _database.Root)
+            .ConfigureServices(services => services.AddSingleton<ICliExecutableLocator>(
+                new AvailableBackendLocator(Path.Combine(_database.Root, "opencode-fixture.exe"))))
+            .Build();
 
         await HostBootstrapper.InitializeAsync(host);
 
@@ -106,6 +112,17 @@ public sealed class StartupReconciliationTests : IDisposable
             sessionId: "session-active",
             state: "Starting",
             processState: $"pid:{int.MaxValue};name:opencode");
+    }
+
+    private sealed class AvailableBackendLocator(string path) : ICliExecutableLocator
+    {
+        public Task<string?> LocateAsync(string executableName, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // The reconciliation probe checks availability, then the persisted PID;
+            // it never executes this synthetic path or searches the user's PATH.
+            return Task.FromResult<string?>(path);
+        }
     }
 
     private sealed class StubInstanceGuard : IApplicationInstanceGuard

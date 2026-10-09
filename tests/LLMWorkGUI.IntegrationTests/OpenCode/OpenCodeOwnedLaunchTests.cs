@@ -7,11 +7,16 @@ using LLMWorkGUI.Backends.OpenCode;
 using LLMWorkGUI.Infrastructure.Processes;
 using Microsoft.Extensions.Options;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace LLMWorkGUI.IntegrationTests.OpenCode;
 
 public sealed class OpenCodeOwnedLaunchTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public OpenCodeOwnedLaunchTests(ITestOutputHelper output) => _output = output;
+
     [Theory]
     [InlineData("", "KEY", "value")]
     [InlineData("outside/path", "KEY", "value")]
@@ -101,6 +106,25 @@ public sealed class OpenCodeOwnedLaunchTests
             Assert.Equal(files.Root, data.RootElement.GetProperty("Directory").GetString());
             Assert.Equal(files.Root, data.RootElement.GetProperty("Home").GetString());
             Assert.Equal(id, instance.InstanceId);
+        }
+        catch
+        {
+            // Startup cleanup has its own deadline and can mask the original
+            // failure. Preserve the owned console fixture's output in the TRX.
+            _output.WriteLine($"Owned fixture capture created: {File.Exists(capture)}");
+            foreach (var path in Directory.EnumerateFiles(logs.Root, "*.log", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    var text = await File.ReadAllTextAsync(path);
+                    _output.WriteLine($"{Path.GetFileName(path)}: {text[..Math.Min(text.Length, 4096)]}");
+                }
+                catch (IOException error)
+                {
+                    _output.WriteLine($"{Path.GetFileName(path)} could not be read: {error.GetType().Name}");
+                }
+            }
+            throw;
         }
         finally
         {
